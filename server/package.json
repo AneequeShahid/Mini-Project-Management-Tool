@@ -1,0 +1,21 @@
+{
+  "name": "mini-project-management-tool-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express API for Mini Project Management Tool (Deliverable 2)",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index.js",
+    "seed": "node src/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.2",
+    "uuid": "^11.1.0"
+  }
+}
