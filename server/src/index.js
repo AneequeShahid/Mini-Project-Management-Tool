@@ -9,6 +9,7 @@ import projectRoutes from "./routes/projects.js";
 import sprintRoutes from "./routes/sprints.js";
 import taskRoutes from "./routes/tasks.js";
 import burndownRoutes from "./routes/burndown.js";
+import { connectDB } from "./utils/db.js";
 
 const app = express();
 app.use(cors());
@@ -22,11 +23,14 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/burndown", burndownRoutes);
 
 app.get("/health", (req, res) => res.json({ ok: true }));
-app.use((err, req, res, next) => {
-  const status = err.status || 500;
-  console.error(err);
-  res.status(status).json({ message: err.message || "Server Error" });
-});
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`API running on :${port}`));
+async function start() {
+  await connectDB(process.env.MONGODB_URI);
+  const port = process.env.PORT || 4000;
+  app.listen(port, () => console.log(`API running on :${port}`));
+}
+
+start().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
+});
