@@ -79,9 +79,7 @@ All user-facing endpoints (excluding auth routes) are protected via a custom JWT
 
 ### Sprint & Task Operations
 * `GET /api/sprints` — Fetch all sprints.
-* `POST /api/sprints/create` — Create a new sprint (Manager only).
-* `GET /api/tasks` — List tasks under the active sprint.
-* `PUT /api/tasks/:id/update` — Drag-and-drop task status updates.
+* `POST /api/sprints` — Create a new sprint (Team Member or higher).
 
 ---
 
@@ -96,7 +94,7 @@ npm install
 Create a `.env` file in the `server/` directory:
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://your_username:password@cluster.mongodb.net/project_mgmt
+MONGODB_URI=mongodb+srv://your_username:***@cluster.mongodb.net/project_mgmt
 JWT_SECRET=your_jwt_signing_key
 ```
 Start the local development server:
@@ -122,5 +120,19 @@ The client dashboard will run locally at `http://localhost:5173`.
 
 ---
 
+## ✅ Test Cases
+
+| ID | Description |
+| --- | --- |
+| TC-01 | Login returns a JWT for valid credentials. |
+| TC-02 | Incorrect password returns 401. |
+| TC-03 | Admin can create a sprint and assign members. |
+| TC-04 | Team Member can move tasks between board columns. |
+| TC-05 | Viewer can view the board and burndown data without edit access. |
+| TC-06 | Bug report flag is stored on task creation and exposed in task detail. |
+
+---
+
 ## 🎓 Academic Credit
+
 Developed as a project for the Software Engineering course at **Beaconhouse National University (BNU)**.
