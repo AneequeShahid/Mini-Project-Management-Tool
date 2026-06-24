@@ -11,6 +11,8 @@ const taskSchema = new Schema(
     status: { type: String, enum: ["Todo", "In Progress", "Done"], default: "Todo" },
     assignee: { type: Schema.Types.ObjectId, ref: "User" },
     storyPoints: { type: Number },
+    isBug: { type: Boolean, default: false },
+    bugReport: { type: String },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
