@@ -3,9 +3,10 @@ const API = (() => {
 
   async function request(path, options = {}) {
     const token = localStorage.getItem("token");
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
     const headers = {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...authHeader,
     };
 
     const response = await fetch(`${base}${path}`, {

@@ -95,12 +95,13 @@ Create a `.env` file in the `server/` directory:
 ```env
 PORT=5000
 MONGODB_URI=mongodb+srv://your_username:***@cluster.mongodb.net/project_mgmt
-JWT_SECRET=your_jwt_signing_key
+JWT_SECRET=your_jwt_secret
 ```
-Start the local development server:
+Start the local development server with the local backend port default:
 ```bash
 npm run dev
 ```
+The API listens on `http://localhost:4000` by default.
 
 ### 2. Client Setup
 Navigate to the `client/` directory and install dependencies:
