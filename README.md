@@ -1,43 +1,70 @@
-# 📊 Agile Project Management Tool
+# Mini Project Management Tool — SE Deliverable 2
 
-This is a full-stack Agile project management application designed to facilitate team collaboration, sprint planning, and task tracking. Featuring interactive drag-and-drop sprint boards, real-time burndown charts, and role-based access control, this tool streamlines the software development lifecycle for engineering teams.
-
----
-
-## 🚀 Key Features
-
-* **Interactive Kanban Board**: Built a drag-and-drop task board for visual task lifecycle management (To Do, In Progress, In Review, Done).
-* **Automated Burndown Charts**: Displays real-time sprint velocity charts representing daily project progression and remaining tasks.
-* **Role-Based Access Control (RBAC)**: Secure access management allowing managers to create sprints and assign tasks, while team members update task progress.
-* **Decoupled Three-Tier Architecture**: Deployed the React frontend to **Vercel** and the Node.js/Express backend API to **Railway**, with database services hosted on **MongoDB Atlas**.
-* **Secure Authentication**: Implemented stateless session management utilizing JSON Web Tokens (JWT) and bcrypt password hashing.
+This repo contains the implementation and documentation for Mini Project Management Tool.
 
 ---
 
-## 🛠️ Technology Stack
+## Core Functional Coverage
 
-* **Frontend**: React.js, TailwindCSS, HTML5/CSS3
-* **Backend**: Node.js, Express.js (RESTful APIs)
-* **Database**: MongoDB (Mongoose ORM)
-* **Deployment**: Vercel (Client), Railway (Server), MongoDB Atlas (Database)
-* **Security**: JSON Web Tokens (JWT), bcrypt
+This implementation targets the functional scope defined in the course deliverable:
+
+- **FR1 – User Authentication** — secure login and session management for team members.
+- **FR2 – Backlog Management** — add, edit, delete, and prioritize user stories.
+- **FR3 – Sprint Planning** — configure sprints, set start/end dates, and assign user stories to a sprint.
+- **FR4 – Story Point Assignment** — numeric story point values for backlog items.
+- **FR5 – Sprint Board View** — task board with To-Do, In Progress, and Done columns.
+- **FR6 – Task Status Update** — drag-and-drop-style status updates between board columns.
+- **FR7 – Burndown Chart** — daily burndown tracking and chart data generation.
+- **FR8 – Role Management** — roles for Admin, Team Member, and Viewer.
+- **FR9 – Bug Reporting** — task flagging support in the data model.
+- **FR10 – View-Only Access** — Viewer users may inspect the board and burndown data without edit permissions.
 
 ---
 
-## 📂 Project Architecture
+## Non-Functional Coverage
+
+- **Security** — passwords stored with bcrypt; sessions use JWT with 24-hour expiry.
+- **Performance** — API responses target normal-load response under 500ms.
+- **Usability** — desktop-first interface with concise task flows and clear sprint views.
+- **Reliability** — modular backend structure supports maintainability and extension.
+- **Maintainability** — separated backend into models, routes, and middleware; README documents setup steps.
+- **Portability** — frontend runs on standard modern browsers without extra plugins.
+- **Availability** — deployment-ready service structure for hosting separate frontend, backend, and database tiers.
+
+---
+
+## Project Structure
 
 ```
 mini-project-management-tool/
-├── client/           # React.js Frontend
-│   ├── src/          # Source components, state management
-│   ├── public/       # Static assets
-│   └── package.json  # Frontend dependencies
-├── server/           # Node.js / Express Backend API
-│   ├── controllers/  # Route handlers (auth, tasks, sprints)
-│   ├── models/       # Mongoose Schemas (User, Task, Sprint)
-│   ├── routes/       # Express routes
-│   └── package.json  # Backend dependencies
-└── docs/             # Technical specifications & design diagrams
+├── client/                       # React frontend
+│   ├── public/
+│   └── src/
+│       └── routes/
+│           ├── TaskRoutes.jsx
+│           └── SprintRoutes.jsx
+├── server/                       # Node.js / Express backend
+│   ├── src/
+│   │   ├── middleware/
+│   │   │   └── auth.js           # JWT + role guards
+│   │   ├── models/
+│   │   │   ├── user.js
+│   │   │   ├── project.js
+│   │   │   ├── sprint.js
+│   │   │   ├── task.js
+│   │   │   └── burndown.js
+│   │   ├── routes/
+│   │   │   ├── auth.js
+│   │   │   ├── users.js
+│   │   │   ├── projects.js
+│   │   │   ├── sprints.js
+│   │   │   ├── tasks.js
+│   │   │   └── burndown.js
+│   │   ├── utils/
+│   │   │   └── db.js             # MongoDB connection
+│   │   └── index.js
+│   └── package.json
+└── README.md
 ```
 
 ---
