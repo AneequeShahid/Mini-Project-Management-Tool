@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { requireAuth, requireRole } from "../../server/src/middleware/auth.js";
-import { Burndown } from "../../server/src/models/burndown.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
+import { Burndown } from "../models/burndown.js";
 
 const router = Router();
 
