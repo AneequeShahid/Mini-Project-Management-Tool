@@ -1,139 +1,181 @@
-# Mini Project Management Tool — SE Deliverable 2
+# Mini Project Management Tool 📋
 
-This repo contains the implementation and documentation for Mini Project Management Tool.
+> **A full-stack Agile project management web app** — sprint boards, burndown charts, backlog management, role-based access, and JWT authentication, built with React + Node.js + MongoDB.
 
----
-
-## Core Functional Coverage
-
-This implementation targets the functional scope defined in the course deliverable:
-
-- **FR1 – User Authentication** — secure login and session management for team members.
-- **FR2 – Backlog Management** — add, edit, delete, and prioritize user stories.
-- **FR3 – Sprint Planning** — configure sprints, set start/end dates, and assign user stories to a sprint.
-- **FR4 – Story Point Assignment** — numeric story point values for backlog items.
-- **FR5 – Sprint Board View** — task board with To-Do, In Progress, and Done columns.
-- **FR6 – Task Status Update** — drag-and-drop-style status updates between board columns.
-- **FR7 – Burndown Chart** — daily burndown tracking and chart data generation.
-- **FR8 – Role Management** — roles for Admin, Team Member, and Viewer.
-- **FR9 – Bug Reporting** — task flagging support in the data model.
-- **FR10 – View-Only Access** — Viewer users may inspect the board and burndown data without edit permissions.
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Vite](https://img.shields.io/badge/Vite-Dev%20Server-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
-## Non-Functional Coverage
+## 📖 Description
 
-- **Security** — passwords stored with bcrypt; sessions use JWT with 24-hour expiry.
-- **Performance** — API responses target normal-load response under 500ms.
-- **Usability** — desktop-first interface with concise task flows and clear sprint views.
-- **Reliability** — modular backend structure supports maintainability and extension.
-- **Maintainability** — separated backend into models, routes, and middleware; README documents setup steps.
-- **Portability** — frontend runs on standard modern browsers without extra plugins.
-- **Availability** — deployment-ready service structure for hosting separate frontend, backend, and database tiers.
+**Mini Project Management Tool** is a web application that gives software teams everything they need to run Agile sprints — from backlog grooming to task board updates and burndown tracking. It covers the 10 functional requirements of a lean project management system: user authentication, backlog management, sprint planning, story point assignment, a drag-and-drop task board, live status updates, burndown chart generation, role-based access control, bug flagging, and view-only mode.
+
+The backend is a Node.js + Express REST API with JWT authentication and MongoDB persistence. The frontend is built with React (Vite), featuring a kanban-style Sprint Board component and a Burndown chart visualization.
+
+**Who is it for?** Software engineering students learning full-stack development and Agile methodologies; small teams needing a lightweight self-hosted project tracker.
 
 ---
 
-## Project Structure
+## 📑 Table of Contents
+
+1. [Features](#features)
+2. [Project Structure](#project-structure)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [API Reference](#api-reference)
+6. [Roles & Permissions](#roles--permissions)
+7. [Contributing](#contributing)
+8. [License & Contact](#license--contact)
+
+---
+
+## ✨ Features
+
+- 🔐 **JWT Authentication** — secure login and session management
+- 📝 **Backlog Management** — add, edit, delete, and prioritize user stories with story points
+- 🏃 **Sprint Planning** — configure sprint start/end dates, assign stories to a sprint
+- 📊 **Sprint Board** — kanban view with To-Do, In Progress, and Done columns
+- 🔄 **Task Status Updates** — move tasks between columns
+- 📉 **Burndown Chart** — daily remaining story points tracked and charted
+- 👥 **Role-Based Access** — Admin, Team Member, and Viewer roles
+- 🐛 **Bug Flagging** — mark tasks as bug reports within the data model
+- 👁️ **View-Only Mode** — Viewer users can inspect board and burndown data without edit rights
+
+---
+
+## 🗂️ Project Structure
 
 ```
-mini-project-management-tool/
-├── client/                       # React frontend
-│   ├── public/
-│   └── src/
-│       └── routes/
-│           ├── TaskRoutes.jsx
-│           └── SprintRoutes.jsx
-├── server/                       # Node.js / Express backend
+Mini-Project-Management-Tool/
+├── client/                   # React + Vite frontend
 │   ├── src/
-│   │   ├── middleware/
-│   │   │   └── auth.js           # JWT + role guards
-│   │   ├── models/
-│   │   │   ├── user.js
-│   │   │   ├── project.js
-│   │   │   ├── sprint.js
-│   │   │   ├── task.js
-│   │   │   └── burndown.js
+│   │   ├── components/
+│   │   │   ├── SprintBoard.jsx    # Kanban board (To-Do / In Progress / Done)
+│   │   │   └── Burndown.jsx       # Burndown chart component
 │   │   ├── routes/
-│   │   │   ├── auth.js
-│   │   │   ├── users.js
-│   │   │   ├── projects.js
-│   │   │   ├── sprints.js
-│   │   │   ├── tasks.js
-│   │   │   └── burndown.js
-│   │   ├── utils/
-│   │   │   └── db.js             # MongoDB connection
-│   │   └── index.js
+│   │   │   ├── SprintRoutes.jsx
+│   │   │   └── TaskRoutes.jsx
+│   │   ├── api.js                 # Axios API client
+│   │   └── main.jsx
+│   ├── vite.config.js
 │   └── package.json
+│
+├── server/                   # Node.js + Express backend
+│   └── src/
+│       ├── index.js           # App entry point, MongoDB connection
+│       ├── middleware/
+│       │   └── auth.js        # JWT verification middleware
+│       ├── models/
+│       │   ├── project.js     # Project, Sprint, UserStory schemas
+│       │   └── burndown.js    # Burndown data schema
+│       ├── routes/            # REST API route handlers
+│       └── utils/
+│
+├── docs/
+│   ├── API-Notes.md           # Endpoint documentation
+│   └── Getting-Started.md
 └── README.md
 ```
 
 ---
 
-## 🔒 API Endpoints & Security
+## 🚀 Installation
 
-All user-facing endpoints (excluding auth routes) are protected via a custom JWT validation middleware.
+### Prerequisites
 
-### Authentication
-* `POST /api/auth/register` — Register a new account.
-* `POST /api/auth/login` — Login and receive a stateless JWT.
+| Tool | Version |
+|------|---------|
+| Node.js | ≥ 18 |
+| MongoDB | ≥ 7.0 (local or Atlas) |
+| npm | ≥ 9 |
 
-### Sprint & Task Operations
-* `GET /api/sprints` — Fetch all sprints.
-* `POST /api/sprints` — Create a new sprint (Team Member or higher).
+### Backend
 
----
-
-## ⚙️ Setup & Installation
-
-### 1. Backend Server Setup
-Navigate to the `server/` directory and install dependencies:
 ```bash
+# 1. Clone the repository
+git clone https://github.com/AneequeShahid/Mini-Project-Management-Tool.git
+cd Mini-Project-Management-Tool
+
+# 2. Install server dependencies
 cd server
 npm install
-```
-Create a `.env` file in the `server/` directory:
-```env
-PORT=5000
-MONGODB_URI=mongodb+srv://your_username:***@cluster.mongodb.net/project_mgmt
-JWT_SECRET=your_jwt_secret
-```
-Start the local development server with the local backend port default:
-```bash
-npm run dev
-```
-The API listens on `http://localhost:4000` by default.
 
-### 2. Client Setup
-Navigate to the `client/` directory and install dependencies:
+# 3. Set environment variables
+# Create a .env file in /server:
+echo "MONGODB_URI=mongodb://127.0.0.1:27017/mini_pmt" > .env
+echo "JWT_SECRET=your-secret-key-here" >> .env
+echo "PORT=5000" >> .env
+
+# 4. Start the backend
+node src/index.js
+```
+
+### Frontend
+
 ```bash
-cd ../client
+# In a separate terminal:
+cd client
 npm install
-```
-Create a `.env` file in the `client/` directory:
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-```
-Start the React application:
-```bash
 npm run dev
 ```
-The client dashboard will run locally at `http://localhost:5173`.
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## ✅ Test Cases
+## 💻 Usage
 
-| ID | Description |
-| --- | --- |
-| TC-01 | Login returns a JWT for valid credentials. |
-| TC-02 | Incorrect password returns 401. |
-| TC-03 | Admin can create a sprint and assign members. |
-| TC-04 | Team Member can move tasks between board columns. |
-| TC-05 | Viewer can view the board and burndown data without edit access. |
-| TC-06 | Bug report flag is stored on task creation and exposed in task detail. |
+1. **Register / Login** — create an account and receive a JWT token
+2. **Create a Project** — set up your project and invite team members
+3. **Manage Backlog** — add user stories with story-point estimates
+4. **Plan a Sprint** — select stories from the backlog and set sprint dates
+5. **Update the Board** — move tasks from To-Do → In Progress → Done
+6. **Track Progress** — view the burndown chart as story points are completed
 
 ---
 
-## 🎓 Academic Credit
+## 📡 API Reference
 
-Developed as a project for the Software Engineering course at **Beaconhouse National University (BNU)**.
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/auth/register` | — | Register new user |
+| `POST` | `/api/auth/login` | — | Login, receive JWT |
+| `GET` | `/api/sprints` | JWT | List all sprints |
+| `POST` | `/api/sprints` | JWT (Admin) | Create a sprint |
+| `PATCH` | `/api/tasks/:id/status` | JWT | Update task status |
+| `GET` | `/api/burndown/:sprintId` | JWT | Get burndown data |
+
+Full endpoint documentation in [`docs/API-Notes.md`](docs/API-Notes.md).
+
+---
+
+## 👥 Roles & Permissions
+
+| Action | Admin | Team Member | Viewer |
+|--------|-------|------------|--------|
+| View board & burndown | ✅ | ✅ | ✅ |
+| Update task status | ✅ | ✅ | ❌ |
+| Manage backlog | ✅ | ✅ | ❌ |
+| Create/delete sprints | ✅ | ❌ | ❌ |
+| Manage team members | ✅ | ❌ | ❌ |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit: `git commit -m "feat: describe your change"`
+4. Push and open a Pull Request targeting `main`
+
+---
+
+## 📄 License & Contact
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+**Aneeque Shahid** · [@AneequeShahid](https://github.com/AneequeShahid) · aneequeshahid495@gmail.com
