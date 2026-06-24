@@ -116,9 +116,9 @@ REACT_APP_API_URL=http://localhost:5000/api
 ```
 Start the React application:
 ```bash
-npm start
+npm run dev
 ```
-The client dashboard will run locally at `http://localhost:3000`.
+The client dashboard will run locally at `http://localhost:5173`.
 
 ---
 
