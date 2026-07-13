@@ -1,0 +1,34 @@
+﻿# Dashboards & Analytics
+
+
+- Personal Dashboard
+  - My Tasks
+  - Today's Tasks
+  - Upcoming Deadlines
+  - Calendar
+  - Recent Activity
+  - Assigned PRs
+- Team Dashboard
+  - Team Velocity
+  - Blocked Tasks
+  - Completed Today
+  - Team Workload
+  - Sprint Progress
+  - Active Members
+- Manager Dashboard
+  - Team Health
+  - Sprint Health
+  - Risk Analysis
+  - Delivery Forecast
+  - Resource Utilization
+- Analytics
+  - Team Velocity
+  - Sprint Burndown / Burnup
+  - Lead Time
+  - Cycle Time
+  - Throughput
+  - Team Workload
+  - Time Tracking Reports
+  - Project Health
+  - Risk Score
+  - AI Insights
