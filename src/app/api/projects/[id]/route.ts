@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { PROJECTS } from "@/lib/data";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const project = PROJECTS.find((item) => item.id === id);
+    return project ? NextResponse.json(project) : NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
   const { data, error } = await supabaseServer.from("projects").select("*").eq("id", id).single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 404 });
-  return NextResponse.json(data);
+  return NextResponse.json(error || !data ? PROJECTS.find((item) => item.id === id) : data, { status: error || !data ? 404 : 200 });
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {

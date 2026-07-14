@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Calendar, GanttChartSquare, Gift, Compass, Cpu,
   GitPullRequest, Network, BarChart3, ShieldAlert, Brain, Link2,
   Activity, Video, History, Webhook, Layers, Folder, LayoutGrid,
-  Inbox, Sliders, Sparkles, Search, Bell, Plus, ChevronDown, Settings, LogOut
+  Inbox, Sliders, Sparkles, Search, Bell, Plus, ChevronDown, Settings, LogOut, UsersRound
 } from "lucide-react";
 import { useState } from "react";
 
@@ -23,6 +23,7 @@ const navGroups = [
       { href: "/dashboard/views", label: "Workspace Views", icon: LayoutGrid, badge: "12" },
       { href: "/dashboard/triage", label: "Triage Intake", icon: Inbox },
       { href: "/dashboard/work-items", label: "Custom Fields", icon: Sliders },
+      { href: "/dashboard/team", label: "Team Intelligence", icon: UsersRound, tag: "AI" },
       { href: "/dashboard/calendar", label: "Calendar Hub", icon: Calendar, badge: "3" },
       { href: "/dashboard/gantt", label: "Roadmaps", icon: GanttChartSquare },
       { href: "/dashboard/wrapped", label: "Project Wrapped", icon: Gift },
@@ -56,6 +57,7 @@ const navGroups = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [commandOpen, setCommandOpen] = useState(false);
 
   return (
@@ -161,7 +163,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span>Search...</span>
               <kbd style={{ fontSize: 9, fontFamily: "monospace", background: "#1e1e20", border: "1px solid #3f3f46", borderRadius: 4, padding: "1px 4px", color: "#a1a1aa" }}>⌘K</kbd>
             </button>
-            <button style={{ background: "#5B8CFF", border: "none", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "#000", display: "flex", alignItems: "center", gap: 4 }}>
+            <button onClick={() => router.push("/dashboard/views?createTask=1")} style={{ background: "#5B8CFF", border: "none", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "#000", display: "flex", alignItems: "center", gap: 4 }}>
               <Plus size={12} /> Create
             </button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: "#111113", border: "1px solid #27272A", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>

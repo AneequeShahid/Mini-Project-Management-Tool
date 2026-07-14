@@ -1,55 +1,119 @@
 "use client";
+import { useState, useEffect } from "react";
+import { Rocket, CheckCircle2, XCircle, Clock, RefreshCw, ExternalLink, GitBranch, User, Zap } from "lucide-react";
 
-import { useState } from "react";
-import { HardDrive, CheckCircle2, GitBranch, ArrowUpRight, HelpCircle } from "lucide-react";
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; icon: any }> = {
+  success: { color: "#10b981", bg: "rgba(16,185,129,0.1)", label: "Success", icon: CheckCircle2 },
+  failed: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", label: "Failed", icon: XCircle },
+  building: { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", label: "Building", icon: RefreshCw },
+};
 
 export default function DeploymentsPage() {
-  const [deployments, setDeployments] = useState([
-    { id: "dep_1", project: "Acme Core API", branch: "main", commit: "configure npm legacy-peer-deps", status: "READY", url: "https://gravity-platform.vercel.app" },
-    { id: "dep_2", project: "Acme Core API", branch: "main", commit: "update readme specifications", status: "READY", url: "https://gravity-platform-git-main.vercel.app" }
-  ]);
+  const [deployments, setDeployments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    fetch("/api/deployments")
+      .then(r => r.json())
+      .then(d => { setDeployments(Array.isArray(d) ? d : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const filtered = filter === "all" ? deployments : deployments.filter(d => d.status === filter);
+  const stats = {
+    success: deployments.filter(d => d.status === "success").length,
+    failed: deployments.filter(d => d.status === "failed").length,
+    building: deployments.filter(d => d.status === "building").length,
+  };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-slide-up">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold font-heading text-white tracking-tight leading-tight">Vercel Deployments</h1>
-        <p className="text-slate-400 text-sm mt-1">Review live production release hashes and dynamic branch preview URLs.</p>
+    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em", color: "#f5f5f5" }}>
+            Deployments
+          </h1>
+          <p style={{ fontSize: 13, color: "#52525b", marginTop: 2 }}>CI/CD pipeline status across all projects</p>
+        </div>
+        <button
+          onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 800); }}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#111113", border: "1px solid #27272A", borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 600, color: "#a1a1aa" }}
+        >
+          <RefreshCw size={13} /> Refresh
+        </button>
       </div>
 
-      <div className="space-y-6">
-        {deployments.map((dep) => (
-          <div key={dep.id} className="p-6 bg-white/[0.03] border border-white/10 rounded-[24px] backdrop-blur-[24px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-accent-purple/20 transition-all">
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white font-heading">{dep.project}</h3>
-                <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider font-mono text-accent-emerald bg-accent-emerald/10 border border-accent-emerald/20">
-                  {dep.status}
-                </span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 font-mono">
-                <span className="flex items-center gap-1">
-                  <GitBranch size={12} /> {dep.branch}
-                </span>
-                <span className="text-slate-500 truncate max-w-[250px]">
-                  Commit: {dep.commit}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
-              <a
-                href={dep.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-heading font-semibold rounded-xl transition-all"
-              >
-                Visit App <ArrowUpRight size={12} />
-              </a>
-            </div>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        {[
+          { label: "Successful", value: stats.success, color: "#10b981", bg: "rgba(16,185,129,0.08)" },
+          { label: "Failed", value: stats.failed, color: "#ef4444", bg: "rgba(239,68,68,0.08)" },
+          { label: "Building", value: stats.building, color: "#f59e0b", bg: "rgba(245,158,11,0.08)" },
+        ].map(s => (
+          <div key={s.label} style={{ borderRadius: 12, padding: "16px 20px", background: s.bg, border: `1px solid ${s.color}22` }}>
+            <p style={{ fontSize: 10, fontFamily: "monospace", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{s.label}</p>
+            <p style={{ fontSize: 32, fontWeight: 700, color: s.color, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 8 }}>
+        {["all", "success", "failed", "building"].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid", fontSize: 12, fontWeight: 600, cursor: "pointer", textTransform: "capitalize",
+              borderColor: filter === f ? "#5B8CFF" : "#27272A",
+              background: filter === f ? "rgba(91,140,255,0.1)" : "#111113",
+              color: filter === f ? "#5B8CFF" : "#a1a1aa" }}
+          >{f === "all" ? "All Deployments" : f}</button>
+        ))}
+      </div>
+
+      {/* Deployment list */}
+      <div className="space-y-3">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: 88, borderRadius: 12 }} />
+          ))
+        ) : filtered.map(dep => {
+          const cfg = STATUS_CONFIG[dep.status] || STATUS_CONFIG.building;
+          const Icon = cfg.icon;
+          return (
+            <div key={dep.id} style={{ borderRadius: 12, padding: "16px 20px", background: "#111113", border: "1px solid #27272A", display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Icon size={18} color={cfg.color} style={dep.status === "building" ? { animation: "spin 1s linear infinite" } : undefined} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#f5f5f5" }}>{dep.message}</span>
+                  <span style={{ fontSize: 9, fontFamily: "monospace", background: cfg.bg, color: cfg.color, padding: "2px 6px", borderRadius: 4, textTransform: "uppercase", fontWeight: 700 }}>{cfg.label}</span>
+                </div>
+                <div className="flex items-center gap-4" style={{ fontSize: 11, color: "#52525b", fontFamily: "monospace" }}>
+                  <span className="flex items-center gap-1"><GitBranch size={10} />{dep.project}/{dep.branch}</span>
+                  <span style={{ color: "#3f3f46" }}>·</span>
+                  <span style={{ color: "#5B8CFF" }}>{dep.commit}</span>
+                  <span style={{ color: "#3f3f46" }}>·</span>
+                  <span className="flex items-center gap-1"><User size={10} />{dep.triggered_by}</span>
+                  <span style={{ color: "#3f3f46" }}>·</span>
+                  <span className="flex items-center gap-1"><Clock size={10} />{dep.duration}</span>
+                  <span style={{ color: "#3f3f46" }}>·</span>
+                  <span style={{ padding: "1px 6px", borderRadius: 4, background: "#1e1e20", color: "#a1a1aa", fontSize: 9, textTransform: "uppercase" }}>{dep.environment}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
+                <span style={{ fontSize: 10, color: "#52525b", fontFamily: "monospace" }}>{new Date(dep.created_at).toLocaleString()}</span>
+                {dep.url && (
+                  <a href={dep.url} target="_blank" rel="noreferrer" style={{ width: 28, height: 28, borderRadius: 6, background: "#1e1e20", border: "1px solid #27272A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <ExternalLink size={11} color="#a1a1aa" />
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

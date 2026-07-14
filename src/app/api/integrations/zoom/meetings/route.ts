@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { zoomMeetingsConnector } from "@/integrations/zoom/meetings";
+import { scheduleLocalMeeting } from "@/lib/workspaceRuntime";
 
 export async function POST(request: Request) {
   try {
@@ -10,20 +11,21 @@ export async function POST(request: Request) {
     }
 
     try {
+      if (!process.env.ZOOM_CLIENT_ID) throw new Error("Zoom not configured");
       const res = await zoomMeetingsConnector.createZoomMeeting(workspaceId, topic, startTime, duration);
       return NextResponse.json(res);
     } catch {
-      // Fallback: Generate structured Zoom mock payload if credentials are not configured yet
-      const simulatedMeetingId = Math.floor(Math.random() * 900000000) + 100000000;
-      const simulatedJoinUrl = `https://zoom.us/j/${simulatedMeetingId}`;
-      const password = Math.random().toString(36).slice(-8);
+      const date = startTime.slice(0, 10);
+      const time = startTime.slice(11, 16) || "09:00";
+      const meeting = scheduleLocalMeeting({ title: topic, date, time, duration: `${duration} min`, type: "video" });
 
       return NextResponse.json({
-        meetingId: simulatedMeetingId.toString(),
-        joinUrl: simulatedJoinUrl,
-        password,
+        meetingId: meeting.id,
+        joinUrl: meeting.join_url,
+        password: null,
         topic,
-        message: "Zoom meeting prototype link generated (fallback).",
+        provider: "local",
+        message: "Local video room created. Add Zoom credentials later to create native Zoom meetings.",
       });
     }
   } catch (err: any) {

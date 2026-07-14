@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { toolRegistry } from "@/lib/toolRegistry";
+import { DELIVERY_FORECAST, TEAM_PERFORMANCE, VELOCITY_DATA } from "@/lib/data";
 
 const getOpenRouterClient = () => {
   const apiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY || "dummy-key";
@@ -34,6 +35,18 @@ export async function POST(request: Request) {
   const startTime = Date.now();
   try {
     const { messages, persona = "developer" } = await request.json();
+    const latestPrompt = messages?.filter((message: any) => message.role === "user").at(-1)?.content || "";
+
+    if (!process.env.OPENAI_API_KEY && !process.env.AI_API_KEY) {
+      const lowerPrompt = latestPrompt.toLowerCase();
+      const overloaded = TEAM_PERFORMANCE.find((member) => member.allocation > member.capacity);
+      const reply = lowerPrompt.includes("forecast") || lowerPrompt.includes("delivery")
+        ? `Delivery confidence is ${DELIVERY_FORECAST.confidence}%. The likely finish is ${DELIVERY_FORECAST.projected_completion}; the main intervention is to rebalance ${overloaded?.name || "the overloaded engineer"}'s work.`
+        : lowerPrompt.includes("team") || lowerPrompt.includes("performance")
+          ? `Team delivery is stable. ${overloaded?.name || "One team member"} is above capacity, while the latest sprint delivered ${VELOCITY_DATA.at(-1)?.delivered ?? 0} points. I would move two active work items before the next review.`
+          : `Local ${persona} agent is ready. Based on the current workspace, I recommend turning “${latestPrompt}” into a focused task with a clear owner, due date, and acceptance criteria. Add OPENAI_API_KEY on Vercel to enable live model reasoning.`;
+      return NextResponse.json({ reply, executedActions: [], metrics: { latencyMs: Date.now() - startTime, estimatedCost: 0, agentUsed: persona, modelUsed: "Gravity local intelligence", selfReflectionPassed: true, mode: "local" } });
+    }
 
     const client = getOpenRouterClient();
     const systemPrompt = AGENT_PROMPTS[persona] || AGENT_PROMPTS.developer;

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { 
   Sparkles, Filter, Kanban as KanbanIcon, List as ListIcon, Calendar as CalendarIcon, 
   GanttChartSquare, Save, Plus, ArrowUpDown, ChevronDown, Check, LayoutGrid, User, Clock, 
@@ -14,7 +15,16 @@ import "gantt-task-react/dist/index.css";
 // Dynamically import TipTap Rich Text Editor to prevent SSR issues
 const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), { ssr: false });
 
-export default function ViewsEnginePage() {
+export default function ViewsEnginePageWrapper() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, color: '#52525b' }}>Loading views...</div>}>
+      <ViewsEnginePage />
+    </Suspense>
+  );
+}
+
+function ViewsEnginePage() {
+  const searchParams = useSearchParams();
   // Config & Definitions
   const [projects, setProjects] = useState<any[]>([]);
   const [sprints, setSprints] = useState<any[]>([]);
@@ -126,6 +136,10 @@ export default function ViewsEnginePage() {
   useEffect(() => {
     loadBaseConfig();
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get("createTask") === "1") setIsNewTaskOpen(true);
+  }, [searchParams]);
 
   // Reload tasks when selected project changes
   useEffect(() => {

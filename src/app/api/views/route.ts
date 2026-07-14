@@ -1,24 +1,10 @@
-import { NextResponse } from "next/server";
-import { dbHelper } from "@/lib/dbHelper";
-
-export async function GET(request: Request) {
-  try {
-    const data = await dbHelper.getViews();
-    return NextResponse.json(data);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    if (!body.name || !body.type) {
-      return NextResponse.json({ error: "name and type are required" }, { status: 400 });
-    }
-    const data = await dbHelper.createView(body);
-    return NextResponse.json(data, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+import { NextResponse } from 'next/server';
+const SAVED_VIEWS = [
+  { id: 'view-1', name: 'Sprint 12 Board', type: 'Kanban', query: { filterStatus: 'all', filterPriority: 'all', groupBy: 'status', sortBy: 'due_date', selectedProject: 'proj-1' } },
+  { id: 'view-2', name: 'Critical Bugs', type: 'List', query: { filterStatus: 'all', filterPriority: 'Critical', groupBy: 'status', sortBy: 'due_date', selectedProject: 'proj-1' } },
+];
+export async function GET() { return NextResponse.json(SAVED_VIEWS); }
+export async function POST(req: Request) {
+  const body = await req.json();
+  return NextResponse.json({ id: `view-${Date.now()}`, ...body }, { status: 201 });
 }

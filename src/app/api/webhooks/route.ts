@@ -1,18 +1,11 @@
-import { NextResponse } from "next/server";
-import { EventBus } from "@/lib/eventBus";
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const source = request.headers.get("x-webhook-source") || "generic";
-
-    await EventBus.publish({
-      action: `WEBHOOK_${source.toUpperCase()}_RECEIVED`,
-      details: body,
-    });
-
-    return NextResponse.json({ success: true, message: "Webhook event published onto event bus." });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
+import { NextResponse } from 'next/server';
+const WEBHOOKS = [
+  { id: 'wh-1', name: 'Vercel Deploy Hook', url: 'https://api.vercel.com/v1/hooks/abc', events: ['deployment.created', 'deployment.succeeded', 'deployment.failed'], status: 'active', last_triggered: '2 hr ago' },
+  { id: 'wh-2', name: 'Slack Notification Hook', url: 'https://hooks.slack.com/services/xxx', events: ['task.created', 'sprint.completed'], status: 'active', last_triggered: '10 min ago' },
+  { id: 'wh-3', name: 'Incident Webhook', url: 'https://events.pagerduty.com/xxx', events: ['deployment.failed', 'guardrail.triggered'], status: 'paused', last_triggered: '2 days ago' },
+];
+export async function GET() { return NextResponse.json(WEBHOOKS); }
+export async function POST(req: Request) {
+  const body = await req.json();
+  return NextResponse.json({ id: `wh-${Date.now()}`, ...body, status: 'active', last_triggered: 'never' }, { status: 201 });
 }

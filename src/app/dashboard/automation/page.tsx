@@ -1,221 +1,147 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Play, Settings, ShieldCheck, HelpCircle, GitCommit, GitBranch, ArrowRight, Plus, X, RefreshCw } from "lucide-react";
+import { Shield, Zap, AlertTriangle, CheckCircle2, XCircle, Plus, ToggleLeft, ToggleRight, Play } from "lucide-react";
 
 export default function AutomationPage() {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [triggerType, setTriggerType] = useState("GITHUB_PUSH");
-  const [actionType, setActionType] = useState("SLACK_MESSAGE");
-  const [creating, setCreating] = useState(false);
-
-  const fetchWorkflows = async () => {
-    try {
-      const res = await fetch("/api/workflows");
-      if (res.ok) {
-        const data = await res.json();
-        setWorkflows(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch workflows:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showCreate, setShowCreate] = useState(false);
+  const [runningId, setRunningId] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", trigger: "", action: "" });
 
   useEffect(() => {
-    fetchWorkflows();
+    fetch("/api/automation")
+      .then(r => r.json())
+      .then(d => { setWorkflows(Array.isArray(d) ? d : []); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
-  const handleCreateWorkflow = async (e: React.FormEvent) => {
+  const toggleWorkflow = (id: string) => {
+    setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: w.status === "active" ? "paused" : "active" } : w));
+  };
+
+  const runWorkflow = (id: string) => {
+    setRunningId(id);
+    setTimeout(() => {
+      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, runs: w.runs + 1, last_run: "just now" } : w));
+      setRunningId(null);
+    }, 1500);
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name) return;
-
-    setCreating(true);
-    try {
-      const res = await fetch("/api/workflows", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          triggerType,
-          actions: [{ type: actionType }],
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setWorkflows(prev => [data, ...prev]);
-        setIsModalOpen(false);
-        setName("");
-      }
-    } catch (err) {
-      console.error("Failed to create workflow:", err);
-    } finally {
-      setCreating(false);
+    const res = await fetch("/api/automation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    if (res.ok) {
+      const wf = await res.json();
+      setWorkflows(prev => [wf, ...prev]);
+      setShowCreate(false);
+      setForm({ name: "", trigger: "", action: "" });
     }
   };
 
-  const handleTriggerWorkflow = async (workflowId: string) => {
-    try {
-      await fetch("/api/automation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "trigger",
-          workflowId,
-          payload: { timestamp: new Date().toISOString() },
-        }),
-      });
-      alert("Workflow execution triggered successfully!");
-    } catch (err) {
-      console.error("Trigger workflow failed:", err);
-    }
-  };
+  const active = workflows.filter(w => w.status === "active").length;
+  const totalRuns = workflows.reduce((s, w) => s + (w.runs || 0), 0);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-slide-up relative">
-      {/* Header */}
-      <div className="flex justify-between items-start">
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold font-heading text-white tracking-tight leading-tight">Workflow Automations</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure event-driven workflows mapping system activities to external integrations.</p>
+          <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em", color: "#f5f5f5" }}>Automation</h1>
+          <p style={{ fontSize: 13, color: "#52525b", marginTop: 2 }}>Event-driven workflows that run on your stack</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-accent-purple to-accent-blue text-white text-xs font-bold font-heading rounded-xl hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-        >
-          <Plus size={14} /> Create Workflow
+        <button onClick={() => setShowCreate(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#8b5cf6", border: "none", borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#fff" }}>
+          <Plus size={13} /> New Workflow
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Workflows list */}
-        <div className="lg:col-span-2 space-y-6">
-          {loading ? (
-            <p className="text-xs text-slate-500 font-mono">Loading active workflows from database...</p>
-          ) : workflows.length === 0 ? (
-            <div className="p-8 border border-dashed border-white/10 rounded-[28px] text-center text-xs text-slate-500">
-              No workflow automations defined. Click "Create Workflow" to get started.
-            </div>
-          ) : (
-            workflows.map((wf) => (
-              <div key={wf.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-[24px] backdrop-blur-[24px] flex items-center justify-between hover:border-accent-purple/20 transition-all duration-300">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-white font-heading">{wf.name}</h3>
-                    <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${wf.active ? "text-accent-emerald bg-accent-emerald/10 border border-accent-emerald/20" : "text-slate-500 bg-white/5 border border-white/10"}`}>
-                      {wf.active ? "Active" : "Disabled"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
-                    <span className="px-2 py-1 bg-white/5 rounded border border-white/5 text-accent-cyan font-bold">{wf.trigger_type}</span>
-                    <ArrowRight size={14} className="text-slate-600" />
-                    <span className="px-2 py-1 bg-white/5 rounded border border-white/5 text-accent-purple font-bold">
-                      {wf.actions?.[0]?.type || "ACTION"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleTriggerWorkflow(wf.id)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-accent-purple/10 hover:bg-accent-purple/20 text-xs font-semibold text-accent-purple font-heading border border-accent-purple/20 rounded-xl transition-colors cursor-pointer"
-                  >
-                    <Play size={12} /> Trigger
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Info panel */}
-        <div className="p-6 bg-white/[0.03] border border-white/10 rounded-[28px] backdrop-blur-[24px] flex flex-col justify-between space-y-6 h-fit">
-          <div className="space-y-4">
-            <h3 className="text-xs uppercase font-bold tracking-wider text-slate-400 font-heading">Event Dispatcher Bus</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Every workflow executes asynchronously from the central **Event Bus**. When an event matches the trigger criteria, the action dispatcher logs payload inputs and posts metrics onto Vercel logs.
-            </p>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        {[
+          { label: "Active Workflows", value: active, color: "#10b981" },
+          { label: "Total Runs", value: totalRuns, color: "#5B8CFF" },
+          { label: "Paused", value: workflows.length - active, color: "#f59e0b" },
+        ].map(s => (
+          <div key={s.label} style={{ borderRadius: 12, padding: "16px 20px", background: "#111113", border: "1px solid #27272A" }}>
+            <p style={{ fontSize: 10, fontFamily: "monospace", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{s.label}</p>
+            <p style={{ fontSize: 32, fontWeight: 700, color: s.color, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{s.value}</p>
           </div>
-
-          <div className="text-[10px] text-slate-500 pt-4 border-t border-white/5 flex items-center gap-1.5">
-            <HelpCircle size={12} /> Integrates with n8n Cloud triggers.
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Create Workflow Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in p-4">
-          <div className="bg-bg-dark border border-white/10 p-6 rounded-[28px] max-w-md w-full space-y-6 relative shadow-2xl">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 p-1.5 bg-white/5 hover:bg-white/10 border border-white/5 text-slate-400 hover:text-white rounded-xl transition-colors"
-            >
-              <X size={16} />
-            </button>
-
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold font-heading text-white">Create Automation</h2>
-              <p className="text-xs text-slate-400">Map system workspace triggers directly to integration actions.</p>
-            </div>
-
-            <form onSubmit={handleCreateWorkflow} className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Workflow Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Broadcast GitHub Commits"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-purple/40"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Event Trigger</label>
-                  <select
-                    value={triggerType}
-                    onChange={(e) => setTriggerType(e.target.value)}
-                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-purple/40"
-                  >
-                    <option value="GITHUB_PUSH" className="bg-bg-dark">GitHub Push</option>
-                    <option value="TASK_CREATED" className="bg-bg-dark">Task Created</option>
-                    <option value="RISK_ALERT" className="bg-bg-dark">Risk Alert</option>
-                  </select>
+      {/* Create modal */}
+      {showCreate && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 18, padding: 28, width: 440 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#f5f5f5", marginBottom: 20 }}>Create Workflow</h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              {[
+                { label: "Workflow Name", key: "name", placeholder: "Auto-assign Critical Bugs" },
+                { label: "Trigger Condition", key: "trigger", placeholder: "Task created with priority=Critical" },
+                { label: "Action", key: "action", placeholder: "Assign to lead + notify Slack" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{f.label}</label>
+                  <input
+                    type="text"
+                    value={(form as any)[f.key]}
+                    onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
+                    required
+                    style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Action Integration</label>
-                  <select
-                    value={actionType}
-                    onChange={(e) => setActionType(e.target.value)}
-                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-purple/40"
-                  >
-                    <option value="SLACK_MESSAGE" className="bg-bg-dark">Slack Message</option>
-                    <option value="EMAIL" className="bg-bg-dark">Email Notification</option>
-                  </select>
-                </div>
+              ))}
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowCreate(false)} style={{ flex: 1, padding: "9px", background: "#1e1e20", border: "1px solid #27272A", borderRadius: 10, color: "#a1a1aa", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: "9px", background: "#8b5cf6", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Create</button>
               </div>
-
-              <button
-                type="submit"
-                disabled={creating}
-                className="w-full py-3 bg-gradient-to-r from-accent-purple to-accent-blue text-white font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                {creating ? <RefreshCw size={14} className="animate-spin" /> : "Create Workflow"}
-              </button>
             </form>
           </div>
         </div>
       )}
+
+      {/* Workflow list */}
+      <div className="space-y-3">
+        {loading ? Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="skeleton" style={{ height: 88, borderRadius: 12 }} />
+        )) : workflows.map(w => (
+          <div key={w.id} style={{ borderRadius: 12, padding: "18px 20px", background: "#111113", border: "1px solid #27272A", display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: w.status === "active" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Zap size={18} color={w.status === "active" ? "#10b981" : "#f59e0b"} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span style={{ fontSize: 14, fontWeight: 600, color: "#f5f5f5" }}>{w.name}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", background: w.status === "active" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)", color: w.status === "active" ? "#10b981" : "#f59e0b", padding: "2px 7px", borderRadius: 4 }}>{w.status}</span>
+              </div>
+              <p style={{ fontSize: 11, color: "#52525b", marginBottom: 2 }}>
+                <span style={{ color: "#5B8CFF" }}>WHEN</span> {w.trigger}
+              </p>
+              <p style={{ fontSize: 11, color: "#52525b" }}>
+                <span style={{ color: "#8b5cf6" }}>THEN</span> {w.action}
+              </p>
+            </div>
+            <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: "#f5f5f5", fontFamily: "monospace" }}>{w.runs} runs</p>
+                <p style={{ fontSize: 10, color: "#52525b" }}>Last: {w.last_run}</p>
+              </div>
+              <button
+                onClick={() => runWorkflow(w.id)}
+                disabled={runningId === w.id}
+                style={{ width: 32, height: 32, borderRadius: 8, background: "#1e1e20", border: "1px solid #27272A", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <Play size={12} color="#a1a1aa" style={runningId === w.id ? { animation: "pulse 0.5s infinite" } : undefined} />
+              </button>
+              <button onClick={() => toggleWorkflow(w.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+                {w.status === "active"
+                  ? <ToggleRight size={24} color="#10b981" />
+                  : <ToggleLeft size={24} color="#3f3f46" />}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

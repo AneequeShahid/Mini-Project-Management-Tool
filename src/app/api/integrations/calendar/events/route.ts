@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
 import { googleCalendarConnector } from "@/integrations/google/calendar";
+import { CALENDAR_EVENTS } from "@/lib/data";
+import { workspaceRuntime } from "@/lib/workspaceRuntime";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const workspaceId = searchParams.get("workspaceId") || "default-workspace-id";
 
+    if (!process.env.GOOGLE_CLIENT_ID) return NextResponse.json(workspaceRuntime.events);
     const res = await googleCalendarConnector.sync(workspaceId);
     if (!res.success) {
       // Return empty array if not configured/failed
-      return NextResponse.json([]);
+      return NextResponse.json(workspaceRuntime.events);
     }
-    return NextResponse.json(res.events || []);
+    return NextResponse.json(res.events?.length ? res.events : workspaceRuntime.events);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(workspaceRuntime.events);
   }
 }
 
@@ -26,19 +29,19 @@ export async function POST(request: Request) {
     }
 
     try {
+      if (!process.env.GOOGLE_CLIENT_ID) throw new Error("Google Calendar not configured");
       const res = await googleCalendarConnector.createEvent(workspaceId, summary, description, startTime, endTime);
       return NextResponse.json(res);
     } catch {
       // Fallback: Generate structured prototype payload if credentials are not configured yet
-      const simulatedEventId = Math.random().toString(36).substring(7);
-      const simulatedMeetLink = `https://meet.google.com/${simulatedEventId}`;
+      const simulatedEventId = `local-${crypto.randomUUID()}`;
+      const simulatedMeetLink = `https://meet.jit.si/gravity-${simulatedEventId.slice(-8)}`;
+      const event = { id: simulatedEventId, title: summary, description, startTime, endTime, provider: 'local' as const, link: simulatedMeetLink, meetLink: simulatedMeetLink, attendees: [] as string[] };
+      workspaceRuntime.events.unshift(event);
 
       return NextResponse.json({
-        id: simulatedEventId,
-        title: summary,
-        link: "https://calendar.google.com",
-        meetLink: simulatedMeetLink,
-        message: "Google Calendar event prototype entry created (fallback).",
+        ...event,
+        message: "Local calendar event scheduled. Connect Google Calendar later to sync it externally.",
       });
     }
   } catch (err: any) {

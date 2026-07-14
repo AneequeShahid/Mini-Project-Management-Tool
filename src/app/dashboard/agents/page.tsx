@@ -1,154 +1,97 @@
 "use client";
+import { useState, useEffect } from "react";
+import { Cpu, Activity, CheckCircle2, Clock, Zap, BarChart3, RefreshCw } from "lucide-react";
 
-import { useState } from "react";
-import { Cpu, MessageSquare, ShieldCheck, Zap, Sparkles, AlertCircle } from "lucide-react";
+export default function AgentsPage() {
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function AgentsDashboard() {
-  const [activePersona, setActivePersona] = useState("developer");
-  const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
-  const [metrics, setMetrics] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-
-  const agents = [
-    { id: "planner", name: "Planner Agent", desc: "Strategy & Backlog breakdown", success: 94, hallucination: 2, latency: 1.2, cost: 0.0004 },
-    { id: "architect", name: "Architect Agent", desc: "ADRs & Database designs", success: 96, hallucination: 1, latency: 2.1, cost: 0.0008 },
-    { id: "developer", name: "Developer Agent", desc: "Implementation & Code blocks", success: 91, hallucination: 4, latency: 1.8, cost: 0.0006 },
-    { id: "reviewer", name: "Reviewer Agent", desc: "Code quality & Compliance check", success: 98, hallucination: 0, latency: 1.5, cost: 0.0003 },
-    { id: "qa", name: "QA Agent", desc: "Stability & Boundary tests", success: 92, hallucination: 3, latency: 1.4, cost: 0.0004 },
-    { id: "manager", name: "Manager Agent", desc: "Velocities & Resource safety", success: 95, hallucination: 2, latency: 1.1, cost: 0.0002 },
-  ];
-
-  const handleTestPrompt = async () => {
-    if (!prompt.trim()) return;
-    try {
-      setLoading(true);
-      setResponse("");
-      setMetrics(null);
-
-      const res = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: prompt }],
-          persona: activePersona
-        }),
-      });
-
-      if (!res.ok) throw new Error("AI call failed");
-      const data = await res.json();
-      setResponse(data.reply);
-      setMetrics(data.metrics);
-    } catch (err) {
-      console.error(err);
-      setResponse("Sandbox run failed. Please check backend connection.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const selectedAgent = agents.find((a) => a.id === activePersona) || agents[0];
+  useEffect(() => {
+    fetch("/api/ai/agents")
+      .then(r => r.json())
+      .then(d => { setAgents(Array.isArray(d) ? d : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-slide-up">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold font-heading text-white tracking-tight leading-tight">AI Agent Control Deck</h1>
-        <p className="text-slate-400 text-sm mt-1">Configure specialist agent personas, inspect latency profiles, and run self-reflection sandboxes.</p>
+    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em", color: "#f5f5f5" }}>AI Agents</h1>
+          <p style={{ fontSize: 13, color: "#52525b", marginTop: 2 }}>Autonomous agents running across your engineering stack</p>
+        </div>
+        <div className="flex gap-2">
+          <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#111113", border: "1px solid #27272A", borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 600, color: "#a1a1aa" }}>
+            <RefreshCw size={13} /> Sync
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Agent Cards Selection */}
-        <div className="space-y-3">
-          <p className="text-xs uppercase font-bold tracking-wider text-slate-400 font-heading">AI OS Personas</p>
-          {agents.map((agent) => (
-            <button
-              key={agent.id}
-              onClick={() => setActivePersona(agent.id)}
-              className={`w-full text-left p-4 rounded-[20px] transition-all flex items-center justify-between border ${
-                activePersona === agent.id 
-                  ? "bg-accent-purple/10 border-accent-purple/30 text-white" 
-                  : "bg-white/[0.01] border-white/5 text-slate-400 hover:bg-white/[0.03] hover:text-white"
-              }`}
-            >
-              <div>
-                <h4 className="text-xs font-bold font-heading">{agent.name}</h4>
-                <p className="text-[10px] opacity-80 mt-0.5">{agent.desc}</p>
-              </div>
-              <span className={`w-2 h-2 rounded-full ${activePersona === agent.id ? "bg-accent-purple animate-pulse" : "bg-slate-600"}`} />
-            </button>
-          ))}
-        </div>
-
-        {/* Selected Agent Stats Deck & Sandbox */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Metrics Panel */}
-          <div className="p-6 bg-white/[0.03] border border-white/10 rounded-[24px] backdrop-blur-[24px] grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-1">
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Success Rate</p>
-              <p className="text-xl font-extrabold text-accent-emerald font-heading">{selectedAgent.success}%</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Hallucinations</p>
-              <p className="text-xl font-extrabold text-red-400 font-heading">{selectedAgent.hallucination}%</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Avg Latency</p>
-              <p className="text-xl font-extrabold text-accent-cyan font-heading">{selectedAgent.latency}s</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Cost per Token</p>
-              <p className="text-xl font-extrabold text-accent-purple font-heading">${selectedAgent.cost}</p>
-            </div>
+      {/* Summary stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+        {[
+          { label: "Active Agents", value: agents.filter(a => a.status !== "idle").length || 5, color: "#10b981" },
+          { label: "Tasks Completed", value: agents.reduce((s, a) => s + (a.tasks_completed || 0), 0) || 271, color: "#5B8CFF" },
+          { label: "Tokens Used", value: `${((agents.reduce((s, a) => s + (a.tokens_used || 0), 0) || 49920) / 1000).toFixed(1)}K`, color: "#8b5cf6" },
+          { label: "Avg Uptime", value: "99.1%", color: "#f59e0b" },
+        ].map(s => (
+          <div key={s.label} style={{ borderRadius: 12, padding: "16px 20px", background: "#111113", border: "1px solid #27272A" }}>
+            <p style={{ fontSize: 10, fontFamily: "monospace", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{s.label}</p>
+            <p style={{ fontSize: 28, fontWeight: 700, color: s.color, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{s.value}</p>
           </div>
+        ))}
+      </div>
 
-          {/* Sandbox Terminal */}
-          <div className="p-6 bg-white/[0.03] border border-white/10 rounded-[24px] backdrop-blur-[24px] space-y-4">
-            <div className="flex items-center gap-2">
-              <Cpu size={16} className="text-accent-purple" />
-              <h3 className="text-sm font-bold font-heading text-white">Sandbox Run</h3>
-            </div>
-            
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder={`Prompt ${selectedAgent.name} (e.g. Write task list for login screen)...`}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleTestPrompt()}
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:border-accent-purple/50 text-white"
-              />
-              <button
-                onClick={handleTestPrompt}
-                disabled={loading || !prompt.trim()}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-accent-purple to-accent-blue text-white font-bold font-heading text-xs hover:brightness-110 active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
-              >
-                {loading ? "Running..." : "Run"}
-              </button>
+      {/* Agent cards */}
+      <div className="space-y-4">
+        {loading ? Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ height: 120, borderRadius: 14, background: "#111113", border: "1px solid #27272A" }} />
+        )) : agents.map(agent => (
+          <div key={agent.id} style={{ borderRadius: 14, padding: "20px 24px", background: "#111113", border: `1px solid ${agent.color}22`, display: "flex", alignItems: "center", gap: 20 }}>
+            {/* Avatar */}
+            <div style={{ width: 52, height: 52, borderRadius: 14, background: `${agent.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16, fontWeight: 800, color: agent.color, fontFamily: "'Space Grotesk', sans-serif" }}>
+              {agent.avatar}
             </div>
 
-            {/* Sandbox Response Output */}
-            {response && (
-              <div className="p-4 bg-black/35 rounded-2xl border border-white/5 space-y-3">
-                <div className="flex items-center gap-1.5 text-accent-emerald text-[10px] font-bold uppercase">
-                  <ShieldCheck size={14} /> Output Verified via Self-Reflection Critique
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#f5f5f5", fontFamily: "'Space Grotesk', sans-serif" }}>{agent.name}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", padding: "2px 8px", borderRadius: 4, background: `${agent.color}15`, color: agent.color }}>
+                  {agent.status}
+                </span>
+                <span style={{ fontSize: 10, fontFamily: "monospace", color: "#3f3f46" }}>{agent.model}</span>
+              </div>
+              <p style={{ fontSize: 12, color: "#71717a", marginBottom: 8 }}>{agent.task}</p>
+
+              {/* Progress bar */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#1e1e20", overflow: "hidden" }}>
+                  <div style={{ width: `${agent.progress}%`, height: "100%", borderRadius: 3, background: `linear-gradient(90deg, ${agent.color}, ${agent.color}88)`, transition: "width 1s ease" }} />
                 </div>
-                <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-mono">
-                  {response}
-                </p>
-
-                {metrics && (
-                  <div className="pt-3 border-t border-white/5 flex flex-wrap gap-4 text-[9px] text-slate-400 font-mono">
-                    <div>⏱ Latency: <span className="text-white font-semibold">{metrics.latencyMs}ms</span></div>
-                    <div>💰 Cost: <span className="text-white font-semibold">${metrics.estimatedCost}</span></div>
-                    <div>🔮 Model: <span className="text-white font-semibold">{metrics.modelUsed.split("/").pop()}</span></div>
-                    <div>✨ Refined: <span className="text-white font-semibold">{metrics.selfReflectionPassed ? "No" : "Yes"}</span></div>
-                  </div>
-                )}
+                <span style={{ fontSize: 11, fontWeight: 700, color: agent.color, fontFamily: "monospace", minWidth: 36 }}>{agent.progress}%</span>
               </div>
-            )}
+            </div>
+
+            {/* Metrics */}
+            <div style={{ display: "flex", gap: 16, flexShrink: 0 }}>
+              {[
+                { label: "Tasks", value: agent.tasks_completed, icon: CheckCircle2 },
+                { label: "Tokens", value: `${(agent.tokens_used / 1000).toFixed(1)}K`, icon: Zap },
+                { label: "Uptime", value: agent.uptime, icon: Activity },
+              ].map(m => {
+                const Icon = m.icon;
+                return (
+                  <div key={m.label} style={{ textAlign: "center" }}>
+                    <Icon size={12} color="#3f3f46" style={{ margin: "0 auto 4px" }} />
+                    <p style={{ fontSize: 14, fontWeight: 700, color: "#f5f5f5", fontFamily: "monospace" }}>{m.value}</p>
+                    <p style={{ fontSize: 9, color: "#3f3f46", textTransform: "uppercase" }}>{m.label}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
