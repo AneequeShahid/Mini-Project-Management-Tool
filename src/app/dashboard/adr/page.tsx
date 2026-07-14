@@ -1,179 +1,103 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Sparkles, GitPullRequest, Shield, FileText, CheckCircle2, XCircle } from "lucide-react";
-import { SkeletonCard } from "@/components/Skeleton";
+import { FileText, Plus, CheckCircle2, Clock, User, ChevronDown, ChevronRight } from "lucide-react";
 
-export default function AdrDashboard() {
-  const [adrs, setAdrs] = useState<any[]>([]);
-  const [prompt, setPrompt] = useState("");
-  const [projectId, setProjectId] = useState("");
+const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
+  accepted: { color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+  proposed: { color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+  deprecated: { color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+  superseded: { color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+};
+
+export default function ADRPage() {
+  const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const projsRes = await fetch("/api/projects");
-      if (projsRes.ok) {
-        const projs = await projsRes.json();
-        if (projs.length > 0) {
-          setProjectId(projs[0].id);
-          const adrsRes = await fetch(`/api/ai/adr?projectId=${projs[0].id}`);
-          if (adrsRes.ok) {
-            const data = await adrsRes.json();
-            setAdrs(data);
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Failed to load ADRs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [form, setForm] = useState({ title: "", context: "", decision: "", consequences: "", status: "proposed", author: "AS" });
 
   useEffect(() => {
-    loadData();
+    fetch("/api/adr").then(r => r.json()).then(d => { setRecords(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  const handleCreateAdr = async () => {
-    if (!prompt.trim() || !projectId) return;
-    try {
-      setGenerating(true);
-      const res = await fetch("/api/ai/adr", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, prompt }),
-      });
-      if (!res.ok) throw new Error("ADR generation failed");
-      const newAdr = await res.json();
-      setAdrs((prev) => [newAdr, ...prev]);
-      setPrompt("");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setGenerating(false);
-    }
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch("/api/adr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    if (res.ok) { const r = await res.json(); setRecords(prev => [r, ...prev]); setShowCreate(false); setForm({ title: "", context: "", decision: "", consequences: "", status: "proposed", author: "AS" }); }
   };
-
-  const handleUpdateStatus = async (id: string, status: string) => {
-    try {
-      const res = await fetch("/api/ai/adr", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status }),
-      });
-      if (res.ok) {
-        setAdrs((prev) => prev.map((a) => a.id === id ? { ...a, status } : a));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 border-4 border-accent-purple border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-slide-up">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold font-heading text-white tracking-tight leading-tight">Architecture Decision Records</h1>
-        <p className="text-slate-400 text-sm mt-1">AI-generated log of structural architectural proposals, impacts, approvals, and history.</p>
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em", color: "#f5f5f5" }}>Architecture Decision Records</h1>
+          <p style={{ fontSize: 13, color: "#52525b", marginTop: 2 }}>{records.length} decisions documented</p>
+        </div>
+        <button onClick={() => setShowCreate(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#5B8CFF", border: "none", borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#000" }}>
+          <Plus size={13} /> New ADR
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Create ADR panel */}
-        <div className="p-6 bg-white/[0.03] border border-white/10 rounded-[24px] backdrop-blur-[24px] space-y-4 h-fit">
-          <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-accent-purple" />
-            <h3 className="text-sm font-bold font-heading text-white">Generate ADR Proposal</h3>
-          </div>
-          <div className="space-y-3">
-            <textarea
-              placeholder="e.g. Implement multi-region replication for Supabase database layer to support high-availability..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              rows={4}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:border-accent-purple/50 text-white resize-none"
-            />
-            <button
-              onClick={handleCreateAdr}
-              disabled={generating || !prompt.trim()}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-accent-purple to-accent-blue text-white font-bold font-heading text-xs hover:brightness-110 active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
-            >
-              {generating ? "Architect Agent is thinking..." : "Generate Decision Record"}
-            </button>
-          </div>
-        </div>
-
-        {/* List of ADRs */}
-        <div className="lg:col-span-2 space-y-4">
-          <p className="text-xs uppercase font-bold tracking-wider text-slate-400 font-heading">Decision Log History</p>
-          {adrs.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 border border-dashed border-white/10 rounded-2xl">
-              No Architecture Decisions recorded yet. Generate one to start!
-            </div>
-          ) : (
-            adrs.map((adr) => (
-              <div key={adr.id} className="p-6 bg-white/[0.03] border border-white/10 rounded-2xl space-y-4">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex items-center gap-3">
-                    <FileText className="text-accent-blue" size={20} />
-                    <div>
-                      <h4 className="text-sm font-bold text-white font-heading">{adr.title}</h4>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">Created at: {new Date(adr.created_at).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-
-                  {/* Status badge & quick buttons */}
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-1 rounded text-[9px] font-bold uppercase tracking-wider font-heading border ${
-                      adr.status === "Accepted" 
-                        ? "bg-accent-emerald/10 border-accent-emerald/20 text-accent-emerald"
-                        : adr.status === "Rejected"
-                        ? "bg-red-500/10 border-red-500/20 text-red-400"
-                        : "bg-white/5 border-white/10 text-slate-300"
-                    }`}>
-                      {adr.status}
-                    </span>
-                  </div>
+      {showCreate && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 18, padding: 28, width: 480, maxHeight: "80vh", overflowY: "auto" }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#f5f5f5", marginBottom: 20 }}>New Decision Record</h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              {[
+                { label: "Title", key: "title", type: "input", placeholder: "Use X over Y for Z" },
+                { label: "Context", key: "context", type: "textarea", placeholder: "Why is this decision needed?" },
+                { label: "Decision", key: "decision", type: "textarea", placeholder: "What was decided?" },
+                { label: "Consequences", key: "consequences", type: "textarea", placeholder: "What are the implications?" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{f.label}</label>
+                  {f.type === "input" ? (
+                    <input type="text" value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} required style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                  ) : (
+                    <textarea value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} required rows={3} style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+                  )}
                 </div>
-
-                {/* Markdown content preview */}
-                <div className="p-4 bg-black/20 rounded-xl border border-white/5">
-                  <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-mono">
-                    {adr.content}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                {adr.status === "Proposed" && (
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      onClick={() => handleUpdateStatus(adr.id, "Rejected")}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 text-red-400 text-[10px] font-heading font-semibold transition-colors"
-                    >
-                      <XCircle size={12} /> Reject
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(adr.id, "Accepted")}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-accent-emerald/10 hover:bg-accent-emerald/20 border border-accent-emerald/20 text-accent-emerald text-[10px] font-heading font-semibold transition-colors"
-                    >
-                      <CheckCircle2 size={12} /> Accept ADR
-                    </button>
-                  </div>
-                )}
+              ))}
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowCreate(false)} style={{ flex: 1, padding: "9px", background: "#1e1e20", border: "1px solid #27272A", borderRadius: 10, color: "#a1a1aa", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: "9px", background: "#5B8CFF", border: "none", borderRadius: 10, color: "#000", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Record Decision</button>
               </div>
-            ))
-          )}
+            </form>
+          </div>
         </div>
+      )}
+
+      <div className="space-y-3">
+        {records.map(r => {
+          const sc = STATUS_COLORS[r.status] || STATUS_COLORS.accepted;
+          const isExpanded = expanded === r.id;
+          return (
+            <div key={r.id} style={{ borderRadius: 14, background: "#111113", border: "1px solid #27272A", overflow: "hidden" }}>
+              <button onClick={() => setExpanded(isExpanded ? null : r.id)} style={{ width: "100%", padding: "18px 24px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 16, textAlign: "left" }}>
+                {isExpanded ? <ChevronDown size={14} color="#52525b" /> : <ChevronRight size={14} color="#52525b" />}
+                <span style={{ fontSize: 12, fontWeight: 800, color: "#3f3f46", fontFamily: "monospace", minWidth: 70 }}>{r.number}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: "#f5f5f5", flex: 1 }}>{r.title}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", padding: "3px 8px", borderRadius: 4, background: sc.bg, color: sc.color }}>{r.status}</span>
+                <span style={{ fontSize: 10, color: "#3f3f46", fontFamily: "monospace" }}>{r.date}</span>
+                <div style={{ width: 24, height: 24, borderRadius: 6, background: "#1e1e20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#71717a" }}>{r.author}</div>
+              </button>
+              {isExpanded && (
+                <div style={{ padding: "0 24px 20px 54px", borderTop: "1px solid #1c1c1f" }}>
+                  {[
+                    { label: "Context", value: r.context, color: "#5B8CFF" },
+                    { label: "Decision", value: r.decision, color: "#10b981" },
+                    { label: "Consequences", value: r.consequences, color: "#f59e0b" },
+                  ].map(s => (
+                    <div key={s.label} style={{ marginTop: 14 }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, color: s.color, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{s.label}</p>
+                      <p style={{ fontSize: 12, color: "#a1a1aa", lineHeight: 1.6 }}>{s.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
