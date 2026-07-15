@@ -22,6 +22,13 @@ export default function DashboardPage() {
     { id: "3", text: "Perform Vercel sandbox deployment test", checked: false },
   ]);
 
+  // Dynamic states for dashboard actions
+  const [authResolved, setAuthResolved] = useState(false);
+  const [resolveLoading, setResolveLoading] = useState(false);
+  const [showStandup, setShowStandup] = useState(false);
+  const [standupLoading, setStandupLoading] = useState(false);
+  const [slackSuccess, setSlackSuccess] = useState(false);
+
   const addFocus = (e: React.FormEvent) => {
     e.preventDefault();
     if (!focusInput.trim()) return;
@@ -34,6 +41,40 @@ export default function DashboardPage() {
 
   const deleteFocus = (id: string) =>
     setFocusList(focusList.filter((f) => f.id !== id));
+
+  const handleResolveAuth = () => {
+    setResolveLoading(true);
+    setTimeout(() => {
+      setResolveLoading(false);
+      setAuthResolved(true);
+    }, 1500);
+  };
+
+  const handleGenerateStandup = () => {
+    setStandupLoading(true);
+    setTimeout(() => {
+      setStandupLoading(false);
+      setShowStandup(true);
+    }, 1200);
+  };
+
+  const handlePostToSlack = () => {
+    setSlackSuccess(true);
+    setTimeout(() => {
+      setSlackSuccess(false);
+      setShowStandup(false);
+    }, 2000);
+  };
+
+  const briefingItems = [
+    { icon: "✓", col: "#10b981", text: "Yesterday your team merged 14 PRs successfully." },
+    { icon: "✦", col: "#5B8CFF", text: "AI predicts Sprint 12 will finish 1 day early." },
+    { icon: "✓", col: "#10b981", text: "Backend deployment has 73% success probability." },
+    { icon: "⚠", col: "#f59e0b", text: "One engineer appears overloaded (standup offsets)." },
+    authResolved 
+      ? { icon: "✓", col: "#10b981", text: "Authentication failures successfully resolved." }
+      : { icon: "𐄂", col: "#ef4444", text: "Two customers reported authentication failures." }
+  ];
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -57,30 +98,99 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 32px", fontSize: 11, fontFamily: "monospace", color: "#a1a1aa", paddingTop: 4 }}>
-            {[
-              { icon: "✓", col: "#10b981", text: "Yesterday your team merged 14 PRs successfully." },
-              { icon: "✦", col: "#5B8CFF", text: "AI predicts Sprint 12 will finish 1 day early." },
-              { icon: "✓", col: "#10b981", text: "Backend deployment has 73% success probability." },
-              { icon: "⚠", col: "#f59e0b", text: "One engineer appears overloaded (standup offsets)." },
-              { icon: "𐄂", col: "#ef4444", text: "Two customers reported authentication failures." },
-            ].map((b) => (
+            {briefingItems.map((b) => (
               <div key={b.text} className="flex items-center gap-2">
-                <span style={{ color: b.col }}>{b.icon}</span>
+                <span style={{ color: b.col, fontWeight: "bold" }}>{b.icon}</span>
                 <span>{b.text}</span>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button style={{ borderRadius: 10, padding: "7px 14px", background: "#5B8CFF", color: "#000", fontSize: 11, fontWeight: 700, border: "none", cursor: "pointer" }}>
-              Resolve Auth Failures
+            <button 
+              onClick={handleResolveAuth}
+              disabled={authResolved || resolveLoading}
+              style={{ 
+                borderRadius: 10, padding: "7px 14px", 
+                background: authResolved ? "rgba(16,185,129,0.12)" : "#5B8CFF", 
+                color: authResolved ? "#10b981" : "#000", 
+                border: authResolved ? "1px solid rgba(16,185,129,0.2)" : "none",
+                fontSize: 11, fontWeight: 700, cursor: authResolved || resolveLoading ? "default" : "pointer",
+                opacity: resolveLoading ? 0.7 : 1,
+                display: "flex", alignItems: "center", gap: 6
+              }}
+            >
+              {resolveLoading ? "Resolving with Agent..." : authResolved ? "Auth Resolved ✓" : "Resolve Auth Failures"}
             </button>
-            <button style={{ borderRadius: 10, padding: "7px 14px", background: "#18181B", color: "#d4d4d8", fontSize: 11, fontWeight: 700, border: "1px solid #27272A", cursor: "pointer" }}>
-              Generate Standup
+            <button 
+              onClick={handleGenerateStandup}
+              disabled={standupLoading}
+              style={{ 
+                borderRadius: 10, padding: "7px 14px", 
+                background: "#18181B", color: "#d4d4d8", 
+                fontSize: 11, fontWeight: 700, border: "1px solid #27272A", cursor: standupLoading ? "default" : "pointer",
+                opacity: standupLoading ? 0.7 : 1,
+                display: "flex", alignItems: "center", gap: 6
+              }}
+            >
+              {standupLoading ? "Analyzing activity..." : "Generate Standup"}
             </button>
           </div>
         </div>
       </motion.div>
+
+      {/* ── AI Daily Standup Modal ── */}
+      {showStandup && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(12px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "100%", maxWidth: 500, background: "#111214", border: "1px solid #27272A", borderRadius: 18, padding: 24, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)" }}>
+            <div className="flex items-center justify-between pb-3 mb-4" style={{ borderBottom: "1px solid #27272A" }}>
+              <div className="flex items-center gap-2">
+                <Cpu size={16} color="#8b5cf6" />
+                <h3 style={{ fontSize: 15, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#f5f5f5" }}>AI Standup Digest - Sprint 12</h3>
+              </div>
+              <button onClick={() => setShowStandup(false)} style={{ background: "none", border: "none", color: "#52525b", cursor: "pointer" }}>✕</button>
+            </div>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 12, color: "#a1a1aa", lineHeight: 1.5, fontFamily: "monospace" }}>
+              <div>
+                <strong style={{ color: "#5B8CFF" }}>• Aneeque Shahid (Lead Architect):</strong>
+                <p style={{ paddingLeft: 12, color: "#71717a", marginTop: 2 }}>Fixed auth token refresh race condition. Integrating SAML SSO module.</p>
+              </div>
+              <div>
+                <strong style={{ color: "#10b981" }}>• Jordan Lee (Developer):</strong>
+                <p style={{ paddingLeft: 12, color: "#71717a", marginTop: 2 }}>Sprint Velocity charts ready. Wiring interactive timeline widget.</p>
+              </div>
+              <div>
+                <strong style={{ color: "#8b5cf6" }}>• Maria Kim (Developer):</strong>
+                <p style={{ paddingLeft: 12, color: "#71717a", marginTop: 2 }}>Running staging regression tests on Vercel preview environments.</p>
+              </div>
+              <div>
+                <strong style={{ color: "#ef4444" }}>• Ryan Park (Developer):</strong>
+                <p style={{ paddingLeft: 12, color: "#71717a", marginTop: 2 }}>Investigating workspace latency spike on first load. Blocked by API limits.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-3" style={{ borderTop: "1px solid #27272A" }}>
+              <button 
+                onClick={() => setShowStandup(false)} 
+                style={{ flex: 1, padding: "8px", background: "none", border: "1px solid #27272A", borderRadius: 8, color: "#a1a1aa", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+              >
+                Close
+              </button>
+              <button 
+                onClick={handlePostToSlack}
+                disabled={slackSuccess}
+                style={{ 
+                  flex: 1, padding: "8px", background: "#8b5cf6", border: "none", borderRadius: 8, color: "#fff", 
+                  fontSize: 11, fontWeight: 700, cursor: slackSuccess ? "default" : "pointer" 
+                }}
+              >
+                {slackSuccess ? "Posted to Slack! ✓" : "Broadcast to Slack #standup"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Workspace Health Grid ── */}
       <div>

@@ -1,461 +1,142 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { 
-  Sparkles, Plus, Trash2, Tag, BookOpen, Bug, CheckSquare, 
-  Award, AlertCircle, Eye, X, ChevronRight, Info
-} from "lucide-react";
+import { Plus, Search, Filter, CheckSquare, Clock, AlertTriangle, Circle, ChevronDown, X, MoreHorizontal, Trash2, Edit3, ArrowUp, ArrowDown, Minus } from "lucide-react";
+
+const STATUS_OPTIONS = ["Backlog", "Todo", "In Progress", "In Review", "Done"];
+const PRIORITY_OPTIONS = ["Critical", "High", "Medium", "Low"];
+const STATUS_COLORS: Record<string, string> = { Backlog: "#3f3f46", Todo: "#a1a1aa", "In Progress": "#5B8CFF", "In Review": "#8b5cf6", Done: "#10b981" };
+const PRIORITY_COLORS: Record<string, string> = { Critical: "#ef4444", High: "#f59e0b", Medium: "#5B8CFF", Low: "#71717a" };
+const PRIORITY_ICONS: Record<string, any> = { Critical: ArrowUp, High: ArrowUp, Medium: Minus, Low: ArrowDown };
 
 export default function WorkItemsPage() {
-  const [types, setTypes] = useState<any[]>([
-    { id: '1', name: 'Bug', icon: 'bug', color: '#ef4444', count: '24 Issues' },
-    { id: '2', name: 'Feature', icon: 'zap', color: '#10b981', count: '83 Items' },
-    { id: '3', name: 'Epic', icon: 'award', color: '#8b5cf6', count: '12 Items' },
-    { id: '4', name: 'Task', icon: 'check-square', color: '#3b82f6', count: '421 Items' }
-  ]);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
+  const [sortBy, setSortBy] = useState("created_at");
+  const [showCreate, setShowCreate] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState({ title: "", description: "", priority: "Medium", status: "Todo", story_points: 3 });
 
-  const [fields, setFields] = useState<any[]>([
-    { id: '1', name: 'Severity', type: 'select', options: ['Low', 'Medium', 'High', 'Critical'] },
-    { id: '2', name: 'Priority', type: 'select', options: ['Low', 'Medium', 'High'] },
-    { id: '3', name: 'Sprint', type: 'number' },
-    { id: '4', name: 'Owner', type: 'text' },
-    { id: '5', name: 'Estimate', type: 'number' },
-    { id: '6', name: 'SLA', type: 'text' }
-  ]);
+  useEffect(() => {
+    fetch("/api/tasks").then(r => r.json()).then(d => { setTasks(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
-  const [loading, setLoading] = useState(false);
+  const filtered = tasks
+    .filter(t => filterStatus === "all" || t.status === filterStatus)
+    .filter(t => filterPriority === "all" || t.priority === filterPriority)
+    .filter(t => !search || t.title.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => sortBy === "priority" ? PRIORITY_OPTIONS.indexOf(a.priority) - PRIORITY_OPTIONS.indexOf(b.priority) : new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  // Drawer states
-  const [isTypeDrawerOpen, setIsTypeDrawerOpen] = useState(false);
-  const [isFieldDrawerOpen, setIsFieldDrawerOpen] = useState(false);
-
-  // Form states for Work Item Types
-  const [newTypeName, setNewTypeName] = useState("");
-  const [newTypeIcon, setNewTypeIcon] = useState("tag");
-  const [newTypeColor, setNewTypeColor] = useState("#5B8CFF");
-
-  // Form states for Custom Field Definitions
-  const [newFieldName, setNewFieldName] = useState("");
-  const [newFieldType, setNewFieldType] = useState("text");
-  const [newFieldOptionsString, setNewFieldOptionsString] = useState("");
-
-  // Live preview selected card states
-  const [previewType, setPreviewType] = useState('Feature');
-  const [previewColor, setPreviewColor] = useState('#10b981');
-  const [previewIcon, setPreviewIcon] = useState('zap');
-  const [previewPriority, setPreviewPriority] = useState('High');
-  const [previewSprint, setPreviewSprint] = useState('15');
-  const [previewOwner, setPreviewOwner] = useState('Sarah');
-  const [previewSeverity, setPreviewSeverity] = useState('Critical');
-
-  const iconsList = [
-    { name: "tag", label: "🏷️ Tag" },
-    { name: "bug", label: "🐞 Bug" },
-    { name: "zap", label: "✨ Zap" },
-    { name: "check-square", label: "✓ Task" },
-    { name: "award", label: "🚀 Award" },
-    { name: "alert-circle", label: "⚠️ Alert" }
-  ];
-
-  const colorsList = ["#5B8CFF", "#a855f7", "#ef4444", "#06b6d4", "#10b981", "#f59e0b", "#ec4899"];
-
-  const handleCreateType = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTypeName.trim()) return;
-
-    const newItem = {
-      id: Date.now().toString(),
-      name: newTypeName,
-      icon: newTypeIcon,
-      color: newTypeColor,
-      count: '0 Items'
-    };
-
-    setTypes([...types, newItem]);
-    setNewTypeName("");
-    setIsTypeDrawerOpen(false);
+    const res = await fetch("/api/tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, project_id: "proj-1", sprint_id: "spr-1", assignee: "AS", due_date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10), work_item_type_id: "type-1" }) });
+    if (res.ok) { const t = await res.json(); setTasks(prev => [t, ...prev]); setShowCreate(false); setForm({ title: "", description: "", priority: "Medium", status: "Todo", story_points: 3 }); }
   };
 
-  const handleDeleteType = (id: string) => {
-    setTypes(types.filter(t => t.id !== id));
-  };
+  const updateStatus = (id: string, status: string) => setTasks(prev => prev.map(t => t.id === id ? { ...t, status } : t));
+  const deleteTask = (id: string) => setTasks(prev => prev.filter(t => t.id !== id));
 
-  const handleCreateField = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newFieldName.trim()) return;
-
-    const options = newFieldOptionsString
-      ? newFieldOptionsString.split(",").map(o => o.trim()).filter(Boolean)
-      : [];
-
-    const newField = {
-      id: Date.now().toString(),
-      name: newFieldName,
-      type: newFieldType,
-      options
-    };
-
-    setFields([...fields, newField]);
-    setNewFieldName("");
-    setNewFieldOptionsString("");
-    setIsFieldDrawerOpen(false);
-  };
-
-  const handleDeleteField = (id: string) => {
-    setFields(fields.filter(f => f.id !== id));
-  };
-
-  // Get matching icon character
-  const getIconChar = (iconName: string) => {
-    if (iconName === 'bug') return '🐞';
-    if (iconName === 'zap') return '✨';
-    if (iconName === 'award') return '🚀';
-    if (iconName === 'check-square') return '✓';
-    return '🏷️';
-  };
+  const statusCounts = STATUS_OPTIONS.map(s => ({ status: s, count: tasks.filter(t => t.status === s).length }));
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto text-slate-100 p-2 relative min-h-screen">
-      
-      {/* Header */}
-      <div className="border-b border-[#1c1c1c] pb-6">
-        <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Work Items</h1>
-        <p className="text-slate-400 text-sm mt-1">Customize how your workspace tracks and visualizes project deliverables.</p>
+    <div className="max-w-6xl mx-auto space-y-5 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em", color: "#f5f5f5" }}>Work Items</h1>
+          <p style={{ fontSize: 13, color: "#52525b", marginTop: 2 }}>{tasks.length} items across all projects</p>
+        </div>
+        <button onClick={() => setShowCreate(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#5B8CFF", border: "none", borderRadius: 10, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#000" }}>
+          <Plus size={13} /> New Work Item
+        </button>
       </div>
 
-      {/* Main Workspace Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left side panel (8 columns) */}
-        <div className="lg:col-span-8 space-y-8">
-          
-          {/* Work Item Types Cards Section */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-sm font-bold tracking-wider uppercase text-slate-400 font-heading">Work Item Types</h2>
-              <button 
-                onClick={() => setIsTypeDrawerOpen(true)}
-                className="btn btn-secondary btn-sm flex items-center gap-1"
-              >
-                <Plus size={14} /> New Type
-              </button>
-            </div>
-
-            {/* Grid of types */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {types.map((type) => (
-                <div 
-                  key={type.id}
-                  onClick={() => {
-                    setPreviewType(type.name);
-                    setPreviewColor(type.color);
-                    setPreviewIcon(type.icon);
-                  }}
-                  className="bg-[#111113] border border-[#27272a] rounded-xl p-5 hover:-translate-y-0.5 hover:border-slate-700 transition-all duration-300 shadow-card flex items-center justify-between cursor-pointer group"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{getIconChar(type.icon)}</span>
-                    <div>
-                      <h4 className="font-bold font-heading text-white text-sm">{type.name}</h4>
-                      <p className="text-xs text-slate-500">{type.count}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: type.color }} />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDeleteType(type.id); }}
-                      className="p-1.5 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-
-              {/* Add New Type card trigger */}
-              <div 
-                onClick={() => setIsTypeDrawerOpen(true)}
-                className="border border-dashed border-[#27272a] hover:border-slate-600 rounded-xl p-5 flex items-center justify-center gap-2 cursor-pointer transition-all text-slate-500 hover:text-slate-300"
-              >
-                <Plus size={16} />
-                <span className="text-xs font-semibold font-heading">Add Custom Type</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Fields / Metadata Section */}
-          <div className="space-y-4 pt-6 border-t border-[#1c1c1c]">
-            <div className="flex justify-between items-center">
-              <h2 className="text-sm font-bold tracking-wider uppercase text-slate-400 font-heading">Metadata Fields</h2>
-              <button 
-                onClick={() => setIsFieldDrawerOpen(true)}
-                className="btn btn-secondary btn-sm flex items-center gap-1"
-              >
-                <Plus size={14} /> Add Field
-              </button>
-            </div>
-
-            <div className="bg-[#111113] border border-[#27272a] rounded-xl p-6 shadow-card space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {fields.map((field) => (
-                  <div 
-                    key={field.id}
-                    className="px-3.5 py-2 bg-[#18181b] border border-[#27272a] hover:border-slate-600 rounded-lg flex items-center gap-2 transition-all group"
-                  >
-                    <span className="text-xs font-medium text-slate-300">{field.name}</span>
-                    <span className="text-[9px] font-mono bg-slate-900 border border-slate-800 text-slate-500 px-1 rounded uppercase">
-                      {field.type}
-                    </span>
-                    <button
-                      onClick={() => handleDeleteField(field.id)}
-                      className="text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1"
-                    >
-                      <Trash2 size={11} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Right side preview panel (4 columns) */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="p-6 bg-[#111113] border border-[#27272a] rounded-xl space-y-6 shadow-card relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#5B8CFF]/5 rounded-full blur-2xl pointer-events-none" />
-            
-            <div className="flex items-center gap-2 border-b border-[#27272a] pb-3">
-              <Eye size={14} className="text-[#5B8CFF]" />
-              <h3 className="text-xs font-bold tracking-wider uppercase text-white font-heading">Live Preview</h3>
-            </div>
-
-            {/* Simulated Work Card Item */}
-            <div className="bg-[#18181B] border border-[#27272A] rounded-xl p-5 space-y-4 shadow-elevated">
-              <div className="flex justify-between items-center">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-semibold">
-                  <span>{getIconChar(previewIcon)}</span>
-                  <span>{previewType}</span>
-                </span>
-                <span className="text-[10px] text-slate-500 font-mono">G-101</span>
-              </div>
-
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-white leading-normal">Implement customizable metadata views</h4>
-                <p className="text-[11px] text-slate-400 font-normal leading-relaxed">
-                  Allow developers to map custom estimate matrices and SLA alert points dynamically.
-                </p>
-              </div>
-
-              {/* Attributes grid */}
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#27272a] text-[11px]">
-                <div className="space-y-0.5">
-                  <span className="text-slate-500 font-medium">Priority</span>
-                  <p className="text-slate-300 font-semibold">{previewPriority}</p>
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-slate-500 font-medium">Sprint</span>
-                  <p className="text-slate-300 font-semibold">{previewSprint}</p>
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-slate-500 font-medium">Owner</span>
-                  <p className="text-slate-300 font-semibold">{previewOwner}</p>
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-slate-500 font-medium">Severity</span>
-                  <p className="text-red-400 font-semibold">{previewSeverity}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick interactive controls for the live preview */}
-            <div className="space-y-3 pt-3 border-t border-[#27272a]">
-              <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider block">Interactive Controls</span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <label className="block text-[10px] text-slate-500 uppercase mb-1">Priority</label>
-                  <select 
-                    value={previewPriority} 
-                    onChange={e => setPreviewPriority(e.target.value)}
-                    className="w-full bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-slate-300 outline-none"
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] text-slate-500 uppercase mb-1">Severity</label>
-                  <select 
-                    value={previewSeverity} 
-                    onChange={e => setPreviewSeverity(e.target.value)}
-                    className="w-full bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-slate-300 outline-none"
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
+      {/* Status pipeline */}
+      <div style={{ display: "flex", gap: 6 }}>
+        {statusCounts.map(s => (
+          <button key={s.status} onClick={() => setFilterStatus(filterStatus === s.status ? "all" : s.status)} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid", textAlign: "center", cursor: "pointer", borderColor: filterStatus === s.status ? STATUS_COLORS[s.status] : "#27272A", background: filterStatus === s.status ? `${STATUS_COLORS[s.status]}12` : "#111113" }}>
+            <p style={{ fontSize: 20, fontWeight: 700, color: STATUS_COLORS[s.status], fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{s.count}</p>
+            <p style={{ fontSize: 9, color: "#52525b", textTransform: "uppercase", fontFamily: "monospace", marginTop: 2 }}>{s.status}</p>
+          </button>
+        ))}
       </div>
 
-      {/* DRAWER: New Work Item Type */}
-      {isTypeDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          {/* Backdrop */}
-          <div 
-            onClick={() => setIsTypeDrawerOpen(false)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          />
-          {/* Panel */}
-          <div className="relative w-96 bg-[#111113] border-l border-[#27272a] h-full flex flex-col p-6 shadow-2xl z-10 animate-fade-in">
-            <div className="flex justify-between items-center border-b border-[#27272a] pb-4 mb-6">
-              <h3 className="text-base font-bold font-heading text-white">New Work Item Type</h3>
-              <button 
-                onClick={() => setIsTypeDrawerOpen(false)}
-                className="text-slate-400 hover:text-white p-1"
-              >
-                <X size={16} />
-              </button>
-            </div>
+      {/* Search + filters */}
+      <div className="flex gap-3">
+        <div style={{ flex: 1, position: "relative" }}>
+          <Search size={14} color="#3f3f46" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search work items..." style={{ width: "100%", background: "#111113", border: "1px solid #27272A", borderRadius: 10, padding: "9px 12px 9px 34px", color: "#f5f5f5", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+        </div>
+        <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 10, padding: "9px 12px", color: "#a1a1aa", fontSize: 12, outline: "none" }}>
+          <option value="all">All Priorities</option>
+          {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 10, padding: "9px 12px", color: "#a1a1aa", fontSize: 12, outline: "none" }}>
+          <option value="created_at">Newest</option>
+          <option value="priority">Priority</option>
+        </select>
+      </div>
 
-            <form onSubmit={handleCreateType} className="space-y-5 flex-1">
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block">Name</label>
-                <input 
-                  value={newTypeName}
-                  onChange={e => setNewTypeName(e.target.value)}
-                  placeholder="e.g. Subtask, Spike"
-                  className="input"
-                  required
-                />
+      {/* Create modal */}
+      {showCreate && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 18, padding: 28, width: 460 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#f5f5f5", marginBottom: 20 }}>New Work Item</h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Title</label>
+                <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Implement feature..." required style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
               </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block">Color Tag</label>
-                <div className="flex gap-2">
-                  {colorsList.map(c => (
-                    <button 
-                      key={c}
-                      type="button"
-                      onClick={() => setNewTypeColor(c)}
-                      className={`w-6 h-6 rounded-full border transition-all ${
-                        newTypeColor === c ? 'border-white scale-110' : 'border-transparent opacity-80'
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
+              <div>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Description</label>
+                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Details..." rows={3} style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+              </div>
+              <div className="flex gap-3">
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Priority</label>
+                  <select value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))} style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none" }}>
+                    {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#52525b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Story Points</label>
+                  <input type="number" value={form.story_points} onChange={e => setForm(p => ({ ...p, story_points: Number(e.target.value) }))} min={1} max={21} style={{ width: "100%", background: "#18181B", border: "1px solid #27272A", borderRadius: 8, padding: "8px 12px", color: "#f5f5f5", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
                 </div>
               </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block">Select Icon</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {iconsList.map(ico => (
-                    <button 
-                      key={ico.name}
-                      type="button"
-                      onClick={() => setNewTypeIcon(ico.name)}
-                      className={`p-2.5 rounded-lg border text-xs font-semibold transition-all ${
-                        newTypeIcon === ico.name 
-                          ? 'bg-[#5B8CFF]/20 text-[#5B8CFF] border-[#5B8CFF]/40' 
-                          : 'bg-[#18181b] border-[#27272a] text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {ico.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowCreate(false)} style={{ flex: 1, padding: "9px", background: "#1e1e20", border: "1px solid #27272A", borderRadius: 10, color: "#a1a1aa", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: "9px", background: "#5B8CFF", border: "none", borderRadius: 10, color: "#000", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Create</button>
               </div>
-
-              <button 
-                type="submit" 
-                className="btn btn-primary w-full justify-center h-10 mt-6"
-              >
-                Save Work Item Type
-              </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* DRAWER: New Field */}
-      {isFieldDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          {/* Backdrop */}
-          <div 
-            onClick={() => setIsFieldDrawerOpen(false)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          />
-          {/* Panel */}
-          <div className="relative w-96 bg-[#111113] border-l border-[#27272a] h-full flex flex-col p-6 shadow-2xl z-10 animate-fade-in">
-            <div className="flex justify-between items-center border-b border-[#27272a] pb-4 mb-6">
-              <h3 className="text-base font-bold font-heading text-white">Add Custom Field</h3>
-              <button 
-                onClick={() => setIsFieldDrawerOpen(false)}
-                className="text-slate-400 hover:text-white p-1"
-              >
-                <X size={16} />
+      {/* Task list */}
+      <div className="space-y-2">
+        {filtered.map(task => {
+          const PIcon = PRIORITY_ICONS[task.priority] || Minus;
+          return (
+            <div key={task.id} style={{ borderRadius: 10, padding: "14px 18px", background: "#111113", border: "1px solid #27272A", display: "flex", alignItems: "center", gap: 14 }}>
+              <button onClick={() => updateStatus(task.id, task.status === "Done" ? "Todo" : "Done")} style={{ background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                {task.status === "Done" ? <CheckSquare size={16} color="#10b981" /> : <Circle size={16} color="#3f3f46" />}
+              </button>
+              <PIcon size={12} color={PRIORITY_COLORS[task.priority]} style={{ flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: task.status === "Done" ? "#52525b" : "#f5f5f5", textDecoration: task.status === "Done" ? "line-through" : "none" }}>{task.title}</p>
+                <p style={{ fontSize: 10, color: "#3f3f46", fontFamily: "monospace", marginTop: 2 }}>{task.assignee} · {task.story_points}pts · {task.due_date}</p>
+              </div>
+              <select value={task.status} onChange={e => updateStatus(task.id, e.target.value)} style={{ background: `${STATUS_COLORS[task.status]}12`, border: `1px solid ${STATUS_COLORS[task.status]}33`, borderRadius: 6, padding: "4px 8px", color: STATUS_COLORS[task.status], fontSize: 10, fontWeight: 700, outline: "none", cursor: "pointer" }}>
+                {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <button onClick={() => deleteTask(task.id)} style={{ width: 28, height: 28, borderRadius: 6, background: "#1e1e20", border: "1px solid #27272A", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <Trash2 size={11} color="#52525b" />
               </button>
             </div>
-
-            <form onSubmit={handleCreateField} className="space-y-5 flex-1">
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block">Field Name</label>
-                <input 
-                  value={newFieldName}
-                  onChange={e => setNewFieldName(e.target.value)}
-                  placeholder="e.g. Browser, Impact"
-                  className="input"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 font-bold uppercase block">Field Type</label>
-                <select 
-                  value={newFieldType}
-                  onChange={e => setNewFieldType(e.target.value)}
-                  className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-slate-300 outline-none"
-                >
-                  <option value="text">Text Field</option>
-                  <option value="number">Number Field</option>
-                  <option value="date">Date Field</option>
-                  <option value="boolean">Checkbox Boolean</option>
-                  <option value="select">Dropdown Select</option>
-                </select>
-              </div>
-
-              {newFieldType === 'select' && (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase block">Select Options (comma-separated)</label>
-                  <input 
-                    value={newFieldOptionsString}
-                    onChange={e => setNewFieldOptionsString(e.target.value)}
-                    placeholder="Low, Medium, High"
-                    className="input"
-                    required
-                  />
-                </div>
-              )}
-
-              <button 
-                type="submit" 
-                className="btn btn-primary w-full justify-center h-10 mt-6"
-              >
-                Save Custom Field
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
+          );
+        })}
+      </div>
     </div>
   );
 }
