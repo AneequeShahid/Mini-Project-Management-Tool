@@ -241,6 +241,40 @@ function ViewsEnginePage() {
     }
   };
 
+  const handleDropTask = async (taskId: string, targetGroupName: string) => {
+    let updateFields: any = {};
+    if (groupBy === "status") {
+      updateFields = { status: targetGroupName };
+    } else if (groupBy === "priority") {
+      updateFields = { priority: targetGroupName };
+    } else if (groupBy === "work_item_type") {
+      const typeObj = itemTypes.find(t => t.name === targetGroupName);
+      if (typeObj) {
+        updateFields = { work_item_type_id: typeObj.id };
+      }
+    }
+
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateFields)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updated } : t));
+        if (selectedTask?.id === taskId) {
+          setSelectedTask((prev: any) => prev ? { ...prev, ...updated } : null);
+          if (groupBy === "status") setEditTaskStatus(targetGroupName);
+          if (groupBy === "priority") setEditTaskPriority(targetGroupName);
+          if (groupBy === "work_item_type") setEditTaskType(updateFields.work_item_type_id || "");
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleDeleteTask = async (id: string) => {
     if (!confirm("Are you sure you want to delete this task?")) return;
     try {
@@ -554,7 +588,15 @@ function ViewsEnginePage() {
                       });
 
                       return (
-                        <div key={groupName} className="flex-1 min-w-[220px] bg-white/[0.01] border border-white/5 rounded-2xl p-4 flex flex-col h-full overflow-hidden">
+                        <div 
+                          key={groupName} 
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            const id = e.dataTransfer.getData("text/plain");
+                            if (id) handleDropTask(id, groupName);
+                          }}
+                          className="flex-1 min-w-[220px] bg-white/[0.01] border border-white/5 rounded-2xl p-4 flex flex-col h-full overflow-hidden"
+                        >
                           <div className="flex justify-between items-center mb-3">
                             <span className="text-xs font-bold text-white font-heading">{groupName}</span>
                             <span className="px-2 py-0.5 bg-white/5 border border-white/5 text-[9px] font-mono text-slate-400 rounded">{groupTasks.length}</span>
@@ -567,8 +609,13 @@ function ViewsEnginePage() {
                               return (
                                 <button
                                   key={task.id}
+                                  draggable
+                                  onDragStart={(e) => {
+                                    e.dataTransfer.setData("text/plain", task.id);
+                                    e.dataTransfer.effectAllowed = "move";
+                                  }}
                                   onClick={() => handleSelectTask(task)}
-                                  className="w-full text-left p-3.5 bg-white/[0.01] border border-white/5 hover:border-white/10 rounded-xl transition-all flex flex-col gap-2 hover:bg-white/[0.02] cursor-pointer"
+                                  className="w-full text-left p-3.5 bg-white/[0.01] border border-white/5 hover:border-white/10 rounded-xl transition-all flex flex-col gap-2 hover:bg-white/[0.02] cursor-grab active:cursor-grabbing"
                                 >
                                   {typeObj && (
                                     <div className="flex items-center gap-1 text-[9px] font-bold tracking-wider font-heading uppercase" style={{ color: typeObj.color }}>
