@@ -12,6 +12,8 @@ export default function MeetingsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ title: "", type: "standup", date: "", time: "09:00", duration: "30 min" });
+  const [activeNotes, setActiveNotes] = useState<string | null>(null);
+  const [notesMeetingTitle, setNotesMeetingTitle] = useState<string>("");
 
   useEffect(() => {
     fetch("/api/meetings")
@@ -29,6 +31,11 @@ export default function MeetingsPage() {
       setShowCreate(false);
       setForm({ title: "", type: "standup", date: "", time: "09:00", duration: "30 min" });
     }
+  };
+
+  const handleShowNotes = (title: string, summary: string | null) => {
+    setNotesMeetingTitle(title);
+    setActiveNotes(summary || "No notes were recorded for this meeting. AI summaries are generated after recording uploads.");
   };
 
   const upcoming = meetings.filter(m => m.status === "upcoming");
@@ -131,7 +138,10 @@ export default function MeetingsPage() {
                 </div>
               </div>
               {m.recording && (
-                <button style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", background: "rgba(91,140,255,0.1)", border: "1px solid rgba(91,140,255,0.2)", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, color: "#5B8CFF" }}>
+                <button 
+                  onClick={() => handleShowNotes(m.title, m.summary)}
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", background: "rgba(91,140,255,0.1)", border: "1px solid rgba(91,140,255,0.2)", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, color: "#5B8CFF" }}
+                >
                   <FileText size={10} /> Notes
                 </button>
               )}
@@ -139,6 +149,36 @@ export default function MeetingsPage() {
           ))}
         </div>
       </div>
+
+      {/* AI Notes modal */}
+      {activeNotes !== null && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#111113", border: "1px solid #27272A", borderRadius: 18, padding: 28, width: 480 }}>
+            <div className="flex items-center justify-between pb-3 mb-4" style={{ borderBottom: "1px solid #27272A" }}>
+              <div className="flex items-center gap-2">
+                <FileText size={16} color="#5B8CFF" />
+                <h3 style={{ fontSize: 15, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#f5f5f5" }}>AI Meeting Transcript & Notes</h3>
+              </div>
+              <button onClick={() => setActiveNotes(null)} style={{ background: "none", border: "none", color: "#52525b", cursor: "pointer" }}>✕</button>
+            </div>
+            <p style={{ fontSize: 12, color: "#a1a1aa", fontWeight: 700, marginBottom: 8 }}>{notesMeetingTitle}</p>
+            <div style={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 10, padding: 16, maxHeight: "250px", overflowY: "auto", fontSize: 12, color: "#71717a", lineHeight: 1.6 }}>
+              <strong style={{ color: "#d4d4d8" }}>AI Digest & Takeaways:</strong>
+              <p style={{ marginTop: 6 }}>{activeNotes}</p>
+              <p style={{ marginTop: 12, fontSize: 11, fontStyle: "italic", color: "#52525b" }}>Generated automatically by Gravity Co-Pilot from audio transcription analysis.</p>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button 
+                onClick={() => setActiveNotes(null)} 
+                style={{ padding: "8px 20px", background: "#5B8CFF", border: "none", borderRadius: 8, color: "#000", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
