@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Calendar, GanttChartSquare, Gift, Compass, Cpu,
   GitPullRequest, Network, BarChart3, ShieldAlert, Brain, Link2,
   Activity, Video, History, Webhook, Layers, Folder, LayoutGrid,
-  Inbox, Sliders, Sparkles, Search, Bell, Plus, ChevronDown, Settings, LogOut, UsersRound, X
+  Inbox, Sliders, Sparkles, Search, Bell, Plus, ChevronDown, Settings, LogOut, UsersRound, X, Globe
 } from "lucide-react";
 import { useState } from "react";
 
@@ -38,6 +38,8 @@ const navGroups = [
       { href: "/dashboard/adr", label: "ADR Log", icon: GitPullRequest },
       { href: "/dashboard/graph", label: "Knowledge Graph", icon: Network },
       { href: "/dashboard/memory", label: "Eng Memory", icon: Brain, tag: "AI" },
+      { href: "/dashboard/decompose", label: "Task Decompose", icon: Sparkles, tag: "NEW" },
+      { href: "/dashboard/scraper", label: "Web Intelligence", icon: Globe, tag: "AI" },
     ]
   },
   {
