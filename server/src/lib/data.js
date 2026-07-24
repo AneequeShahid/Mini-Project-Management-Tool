@@ -2,7 +2,7 @@ export const dummyData = {
   projects: [
     { _id: "p1", name: "Nucleus Core", health: 92, status: "Active", description: "Core engine refactor" },
     { _id: "p2", name: "Nebula UI", health: 88, status: "Active", description: "Design system migration" },
-    { _id: "p3", name: "Gravity OS", health: 95, status: "Active", description: "Core AI platform" },
+    { _id: "p3", name: "Pulse OS", health: 95, status: "Active", description: "Core AI platform" },
   ],
   tasks: Array.from({ length: 40 }).map((_, i) => ({
     _id: `t${i}`,

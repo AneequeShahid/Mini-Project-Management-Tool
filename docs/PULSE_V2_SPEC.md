@@ -1,7 +1,7 @@
-# Gravity v2 — Master System Architecture Specification
+# Pulse v2 — Master System Architecture Specification
 
 ## 1. High-Level Philosophy
-In **Gravity v2**, the platform shifts from a classic CRUD project management interface to an **AI-Native Project Intelligence Platform**. Every action, state transition, and background sync is modeled as an **Event** dispatched onto a central **Event Bus**. Subsystems subscribe to this event stream to trigger analytics, audit trails, and automated workflows asynchronously.
+In **Pulse v2**, the platform shifts from a classic CRUD project management interface to an **AI-Native Project Intelligence Platform**. Every action, state transition, and background sync is modeled as an **Event** dispatched onto a central **Event Bus**. Subsystems subscribe to this event stream to trigger analytics, audit trails, and automated workflows asynchronously.
 
 ---
 
@@ -42,7 +42,7 @@ In **Gravity v2**, the platform shifts from a classic CRUD project management in
 
 ## 3. Central System: The Event Bus Reactor
 
-To decouple systems and prevent spaghetti code blocks, Gravity v2 implements the **Event Bus** as the core architectural heartbeat:
+To decouple systems and prevent spaghetti code blocks, Pulse v2 implements the **Event Bus** as the core architectural heartbeat:
 
 ```
     GitHub Webhook / UI Action

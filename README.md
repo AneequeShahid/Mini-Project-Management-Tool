@@ -1,10 +1,10 @@
-# Gravity — AI-Native Project Intelligence Platform
+# Pulse — AI-Native Project Intelligence Platform
 
 > **An AI Operating System for modern software engineering teams.**
 
-Gravity is an AI-native Project Intelligence Platform designed to move beyond traditional project management. Instead of simply tracking tasks, Gravity understands project context, reasons over historical decisions, automates engineering workflows, and assists teams through specialized AI agents.
+Pulse is an AI-native Project Intelligence Platform designed to move beyond traditional project management. Instead of simply tracking tasks, Pulse understands project context, reasons over historical decisions, automates engineering workflows, and assists teams through specialized AI agents.
 
-Unlike conventional tools that treat AI as an add-on chatbot, Gravity integrates AI into the core architecture through an event-driven system, semantic memory, hybrid retrieval, human approval workflows, and multi-agent orchestration.
+Unlike conventional tools that treat AI as an add-on chatbot, Pulse integrates AI into the core architecture through an event-driven system, semantic memory, hybrid retrieval, human approval workflows, and multi-agent orchestration.
 
 ---
 
@@ -24,7 +24,7 @@ Modern engineering teams generate enormous amounts of information:
 
 Most of this knowledge becomes fragmented across multiple tools.
 
-Gravity transforms these disconnected events into an intelligent knowledge system capable of answering questions, explaining historical decisions, predicting project risks, and automating repetitive engineering work.
+Pulse transforms these disconnected events into an intelligent knowledge system capable of answering questions, explaining historical decisions, predicting project risks, and automating repetitive engineering work.
 
 ---
 
@@ -32,7 +32,7 @@ Gravity transforms these disconnected events into an intelligent knowledge syste
 
 ## AI Operating System
 
-Gravity introduces an AI Operating System built around specialized agents rather than a single general-purpose assistant.
+Pulse introduces an AI Operating System built around specialized agents rather than a single general-purpose assistant.
 
 Available personas include:
 
@@ -59,7 +59,7 @@ Requests are routed through an Agent Orchestrator which selects the appropriate 
 
 ## AI Tool Calling
 
-Gravity enables AI agents to perform structured actions instead of producing text alone.
+Pulse enables AI agents to perform structured actions instead of producing text alone.
 
 Examples include:
 
@@ -77,7 +77,7 @@ High-impact actions are protected through a Human Approval Queue before executio
 
 AI-generated changes are not executed automatically.
 
-Instead, Gravity intercepts sensitive actions and creates pending proposals.
+Instead, Pulse intercepts sensitive actions and creates pending proposals.
 
 Reviewers can:
 
@@ -92,15 +92,15 @@ This keeps humans in control while still benefiting from AI automation.
 
 # Engineering Memory
 
-Engineering Memory is Gravity's signature capability.
+Engineering Memory is Pulse's signature capability.
 
-Instead of relying only on chat history, Gravity retrieves project knowledge from multiple sources.
+Instead of relying only on chat history, Pulse retrieves project knowledge from multiple sources.
 
 When a user asks:
 
 > "Why did we migrate from MongoDB to PostgreSQL?"
 
-Gravity searches:
+Pulse searches:
 
 * Architecture Decision Records
 * Timeline Events
@@ -122,7 +122,7 @@ This allows the platform to explain engineering decisions rather than simply rec
 
 # Hybrid Retrieval-Augmented Generation
 
-Gravity combines multiple retrieval strategies.
+Pulse combines multiple retrieval strategies.
 
 User Query
 
@@ -156,7 +156,7 @@ This hybrid pipeline improves retrieval quality over vector-only approaches.
 
 # Knowledge Graph
 
-Gravity maintains relationships between engineering entities.
+Pulse maintains relationships between engineering entities.
 
 Nodes include:
 
@@ -177,7 +177,7 @@ Relationships are visualized through an interactive graph, enabling exploration 
 
 # Event-Driven Architecture
 
-Everything inside Gravity is modeled as an event.
+Everything inside Pulse is modeled as an event.
 
 Examples:
 
@@ -220,7 +220,7 @@ Wrapped is generated from historical events rather than manually tracked counter
 
 # Observability
 
-Gravity tracks operational metrics across the platform.
+Pulse tracks operational metrics across the platform.
 
 Examples include:
 
@@ -395,7 +395,7 @@ Production builds can be generated using the standard Next.js build process.
 
 # Current Status
 
-Gravity is a portfolio and research platform demonstrating modern AI-assisted software engineering concepts.
+Pulse is a portfolio and research platform demonstrating modern AI-assisted software engineering concepts.
 
 Implemented capabilities include:
 

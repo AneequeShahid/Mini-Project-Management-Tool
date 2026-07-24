@@ -346,8 +346,8 @@ export default function DashboardPage() {
           <div style={{ borderRadius: 12, padding: 20, background: "#09090B", border: "1px solid #27272A" }}>
             <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "monospace", color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 12 }}>Repository Health</span>
             {[
-              { icon: GitPullRequest, color: "#8b5cf6", repo: "GravityHQ/auth" },
-              { icon: Database, color: "#00e5ff", repo: "GravityHQ/db-core" },
+              { icon: GitPullRequest, color: "#8b5cf6", repo: "PulseHQ/auth" },
+              { icon: Database, color: "#00e5ff", repo: "PulseHQ/db-core" },
             ].map(({ icon: Icon, color, repo }) => (
               <div key={repo} className="flex items-center justify-between mb-2" style={{ padding: "10px 12px", background: "#111113", borderRadius: 8 }}>
                 <div className="flex items-center gap-2">

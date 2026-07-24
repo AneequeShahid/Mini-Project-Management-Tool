@@ -6,7 +6,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
-    name: "Aneeque Shahid", email: "aneeque@gravity.dev", role: "Owner", timezone: "UTC+5",
+    name: "Aneeque Shahid", email: "aneeque@pulse.dev", role: "Owner", timezone: "UTC+5",
     theme: "dark", accentColor: "#5B8CFF", density: "comfortable", notifications_email: true, notifications_slack: true, notifications_push: false,
     twoFactor: true, sessionTimeout: 30, apiKey: "grav_sk_****************************a3f9",
   });

@@ -1,6 +1,6 @@
 # Retrieval-Augmented Generation (RAG) Search
 
-Detailed documentation of Gravity's hybrid RAG search flow.
+Detailed documentation of Pulse's hybrid RAG search flow.
 
 ## RAG Flow Chart
 

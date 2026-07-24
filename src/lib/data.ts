@@ -1,6 +1,6 @@
-// src/lib/data.ts — Gravity Seed Data Store
+// src/lib/data.ts — Pulse Seed Data Store
 export const PROJECTS = [
-  { id: 'proj-1', name: 'Gravity Platform', description: 'Core AI project management platform', status: 'active', priority: 'High', progress: 68, color: '#5B8CFF', team: ['AS', 'MK', 'JL', 'RP', 'TW'], sprint_count: 4, tasks_total: 48, tasks_done: 32 },
+  { id: 'proj-1', name: 'Pulse Platform', description: 'Core AI project management platform', status: 'active', priority: 'High', progress: 68, color: '#5B8CFF', team: ['AS', 'MK', 'JL', 'RP', 'TW'], sprint_count: 4, tasks_total: 48, tasks_done: 32 },
   { id: 'proj-2', name: 'Auth & Identity', description: 'SSO, SAML, and 2FA compliance module', status: 'active', priority: 'Critical', progress: 45, color: '#8b5cf6', team: ['AS', 'RP'], sprint_count: 2, tasks_total: 22, tasks_done: 10 },
   { id: 'proj-3', name: 'Mobile SDK', description: 'React Native SDK for enterprise clients', status: 'planning', priority: 'Medium', progress: 12, color: '#10b981', team: ['JL', 'TW'], sprint_count: 1, tasks_total: 15, tasks_done: 2 },
 ];
@@ -44,12 +44,12 @@ export const CUSTOM_FIELDS = [
 ];
 
 export const DEPLOYMENTS = [
-  { id: 'dep-1', project: 'gravity-platform', branch: 'main', commit: '97fe299', message: 'Port Gravity design system to Next.js', status: 'success', duration: '2m 14s', triggered_by: 'Aneeque Shahid', environment: 'production', created_at: '2026-07-13T13:11:08Z', url: 'https://gravity.vercel.app' },
-  { id: 'dep-2', project: 'gravity-platform', branch: 'main', commit: '53bb51a', message: 'Redesign Modal backdrop blur', status: 'success', duration: '1m 58s', triggered_by: 'GitHub Actions', environment: 'production', created_at: '2026-07-12T04:40:00Z', url: 'https://gravity.vercel.app' },
+  { id: 'dep-1', project: 'pulse-platform', branch: 'main', commit: '97fe299', message: 'Port Pulse design system to Next.js', status: 'success', duration: '2m 14s', triggered_by: 'Aneeque Shahid', environment: 'production', created_at: '2026-07-13T13:11:08Z', url: 'https://pulse.vercel.app' },
+  { id: 'dep-2', project: 'pulse-platform', branch: 'main', commit: '53bb51a', message: 'Redesign Modal backdrop blur', status: 'success', duration: '1m 58s', triggered_by: 'GitHub Actions', environment: 'production', created_at: '2026-07-12T04:40:00Z', url: 'https://pulse.vercel.app' },
   { id: 'dep-3', project: 'auth-service', branch: 'feature/saml', commit: 'a1b2c3d', message: 'Add SAML 2.0 identity provider', status: 'building', duration: '-', triggered_by: 'Aneeque Shahid', environment: 'staging', created_at: '2026-07-13T13:00:00Z', url: null },
-  { id: 'dep-4', project: 'gravity-platform', branch: 'fix/token-refresh', commit: 'e4f5g6h', message: 'Fix auth token refresh race condition', status: 'failed', duration: '0m 48s', triggered_by: 'GitHub Actions', environment: 'staging', created_at: '2026-07-11T18:30:00Z', url: null },
-  { id: 'dep-5', project: 'mobile-sdk', branch: 'main', commit: 'i7j8k9l', message: 'Initial SDK scaffold', status: 'success', duration: '3m 02s', triggered_by: 'Aneeque Shahid', environment: 'preview', created_at: '2026-07-10T10:00:00Z', url: 'https://preview.gravity.vercel.app' },
-  { id: 'dep-6', project: 'gravity-platform', branch: 'main', commit: 'f97e5ae', message: 'Build WorkspaceEmptyState component', status: 'success', duration: '2m 05s', triggered_by: 'GitHub Actions', environment: 'production', created_at: '2026-07-11T06:00:00Z', url: 'https://gravity.vercel.app' },
+  { id: 'dep-4', project: 'pulse-platform', branch: 'fix/token-refresh', commit: 'e4f5g6h', message: 'Fix auth token refresh race condition', status: 'failed', duration: '0m 48s', triggered_by: 'GitHub Actions', environment: 'staging', created_at: '2026-07-11T18:30:00Z', url: null },
+  { id: 'dep-5', project: 'mobile-sdk', branch: 'main', commit: 'i7j8k9l', message: 'Initial SDK scaffold', status: 'success', duration: '3m 02s', triggered_by: 'Aneeque Shahid', environment: 'preview', created_at: '2026-07-10T10:00:00Z', url: 'https://preview.pulse.vercel.app' },
+  { id: 'dep-6', project: 'pulse-platform', branch: 'main', commit: 'f97e5ae', message: 'Build WorkspaceEmptyState component', status: 'success', duration: '2m 05s', triggered_by: 'GitHub Actions', environment: 'production', created_at: '2026-07-11T06:00:00Z', url: 'https://pulse.vercel.app' },
 ];
 
 export const INTEGRATIONS = [
@@ -77,21 +77,21 @@ export const AGENTS = [
 
 export const TIMELINE_EVENTS = [
   { id: 'evt-1', title: 'Auth module finalized', description: 'PR #42 merged by QA Agent', time: '10 min ago', type: 'pr', color: '#8b5cf6', project: 'Auth & Identity' },
-  { id: 'evt-2', title: 'Database schema migration', description: 'Indexes mapped to production successfully', time: '1 hr ago', type: 'db', color: '#10b981', project: 'Gravity Platform' },
-  { id: 'evt-3', title: 'Sprint 12 risk resolved', description: 'Failure probability dropped from 14% to 3%', time: '3 hr ago', type: 'risk', color: '#5B8CFF', project: 'Gravity Platform' },
-  { id: 'evt-4', title: 'Vercel deployment succeeded', description: 'commit 97fe299 to production in 2m 14s', time: '5 hr ago', type: 'deploy', color: '#10b981', project: 'Gravity Platform' },
+  { id: 'evt-2', title: 'Database schema migration', description: 'Indexes mapped to production successfully', time: '1 hr ago', type: 'db', color: '#10b981', project: 'Pulse Platform' },
+  { id: 'evt-3', title: 'Sprint 12 risk resolved', description: 'Failure probability dropped from 14% to 3%', time: '3 hr ago', type: 'risk', color: '#5B8CFF', project: 'Pulse Platform' },
+  { id: 'evt-4', title: 'Vercel deployment succeeded', description: 'commit 97fe299 to production in 2m 14s', time: '5 hr ago', type: 'deploy', color: '#10b981', project: 'Pulse Platform' },
   { id: 'evt-5', title: 'Developer Agent completed 47 tasks', description: 'OAuth callbacks, token refresh, unit tests', time: '1 day ago', type: 'agent', color: '#5B8CFF', project: 'Auth & Identity' },
   { id: 'evt-6', title: 'Security scan flagged 2FA gap', description: '18 admin accounts missing TOTP setup', time: '1 day ago', type: 'security', color: '#ef4444', project: 'Auth & Identity' },
-  { id: 'evt-7', title: 'Sprint 11 completed at 100%', description: '38/38 story points, zero carry-over', time: '2 days ago', type: 'sprint', color: '#10b981', project: 'Gravity Platform' },
-  { id: 'evt-8', title: 'Knowledge graph indexed 6,242 nodes', description: 'Full codebase + docs in vector store', time: '3 days ago', type: 'memory', color: '#8b5cf6', project: 'Gravity Platform' },
+  { id: 'evt-7', title: 'Sprint 11 completed at 100%', description: '38/38 story points, zero carry-over', time: '2 days ago', type: 'sprint', color: '#10b981', project: 'Pulse Platform' },
+  { id: 'evt-8', title: 'Knowledge graph indexed 6,242 nodes', description: 'Full codebase + docs in vector store', time: '3 days ago', type: 'memory', color: '#8b5cf6', project: 'Pulse Platform' },
 ];
 
 export const CALENDAR_EVENTS = [
   { id: 'cal-1', title: 'Sprint 12 Standup', date: '2026-07-14', time: '09:00', duration: '30m', type: 'standup', attendees: ['AS', 'MK', 'JL', 'RP', 'TW'], color: '#5B8CFF', description: 'Daily sync. Focus: auth bug and velocity chart.' },
-  { id: 'cal-2', title: 'Gravity Design Review', date: '2026-07-14', time: '14:00', duration: '1hr', type: 'review', attendees: ['AS', 'TW'], color: '#8b5cf6', description: 'Review modal system and dashboard hero redesign.' },
+  { id: 'cal-2', title: 'Pulse Design Review', date: '2026-07-14', time: '14:00', duration: '1hr', type: 'review', attendees: ['AS', 'TW'], color: '#8b5cf6', description: 'Review modal system and dashboard hero redesign.' },
   { id: 'cal-3', title: 'Auth Security Audit', date: '2026-07-15', time: '10:00', duration: '2hr', type: 'audit', attendees: ['AS', 'RP'], color: '#ef4444', description: 'Quarterly security audit: SAML and 2FA compliance.' },
   { id: 'cal-4', title: 'Sprint 12 Review & Retro', date: '2026-07-20', time: '13:00', duration: '2hr', type: 'review', attendees: ['AS', 'MK', 'JL', 'RP', 'TW'], color: '#10b981', description: 'Demo Sprint 12 features, retrospective, Sprint 13 planning.' },
-  { id: 'cal-5', title: 'Investor Demo Prep', date: '2026-07-17', time: '11:00', duration: '1hr', type: 'meeting', attendees: ['AS'], color: '#f59e0b', description: 'Prepare Gravity live demo for Series A pitch.' },
+  { id: 'cal-5', title: 'Investor Demo Prep', date: '2026-07-17', time: '11:00', duration: '1hr', type: 'meeting', attendees: ['AS'], color: '#f59e0b', description: 'Prepare Pulse live demo for Series A pitch.' },
   { id: 'cal-6', title: 'Mobile SDK Kickoff', date: '2026-07-21', time: '09:00', duration: '1.5hr', type: 'kickoff', attendees: ['AS', 'JL', 'TW'], color: '#10b981', description: 'Define architecture, milestones, and team for SDK.' },
 ];
 
@@ -163,7 +163,7 @@ export const WORKFLOWS = [
 
 export const MEETINGS = [
   { id: 'mtg-1', title: 'Sprint 12 Daily Standup', type: 'standup', date: '2026-07-13', time: '09:00', duration: '30 min', attendees: 5, status: 'completed', recording: true, summary: 'Auth bug assigned to RP, 28/42 pts done' },
-  { id: 'mtg-2', title: 'Gravity Design Review', type: 'review', date: '2026-07-13', time: '14:00', duration: '1 hr', attendees: 2, status: 'completed', recording: true, summary: 'Approved modal system and dark theme' },
+  { id: 'mtg-2', title: 'Pulse Design Review', type: 'review', date: '2026-07-13', time: '14:00', duration: '1 hr', attendees: 2, status: 'completed', recording: true, summary: 'Approved modal system and dark theme' },
   { id: 'mtg-3', title: 'Auth Security Audit', type: 'audit', date: '2026-07-15', time: '10:00', duration: '2 hr', attendees: 2, status: 'upcoming', recording: false, summary: null },
   { id: 'mtg-4', title: 'Investor Demo Preparation', type: 'planning', date: '2026-07-17', time: '11:00', duration: '1 hr', attendees: 1, status: 'upcoming', recording: false, summary: null },
   { id: 'mtg-5', title: 'Sprint 12 Review & Retro', type: 'retro', date: '2026-07-20', time: '13:00', duration: '2 hr', attendees: 5, status: 'upcoming', recording: false, summary: null },

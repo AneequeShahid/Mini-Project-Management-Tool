@@ -165,7 +165,7 @@ export default function MeetingsPage() {
             <div style={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 10, padding: 16, maxHeight: "250px", overflowY: "auto", fontSize: 12, color: "#71717a", lineHeight: 1.6 }}>
               <strong style={{ color: "#d4d4d8" }}>AI Digest & Takeaways:</strong>
               <p style={{ marginTop: 6 }}>{activeNotes}</p>
-              <p style={{ marginTop: 12, fontSize: 11, fontStyle: "italic", color: "#52525b" }}>Generated automatically by Gravity Co-Pilot from audio transcription analysis.</p>
+              <p style={{ marginTop: 12, fontSize: 11, fontStyle: "italic", color: "#52525b" }}>Generated automatically by Pulse Co-Pilot from audio transcription analysis.</p>
             </div>
             <div className="flex justify-end mt-6">
               <button 

@@ -1,11 +1,11 @@
-# The Grand Demo: "A Day in the Life of Gravity"
+# The Grand Demo: "A Day in the Life of Pulse"
 
 This script outlines the narrative for the project demo video. The goal is to show the **Cohesive Flow** of the system, not just a list of features.
 
 ## 🎬 Scene 1: The Trigger (The la-Infrastructure)
-**Visual**: Split screen. Left side: GitHub PR merged. Right side: Gravity Dashboard.
+**Visual**: Split screen. Left side: GitHub PR merged. Right side: Pulse Dashboard.
 - **Action**: Merge a PR.
-- **Narrative**: "It starts with a merge. The moment code hits main, Gravity's Event Bus triggers a chain reaction."
+- **Narrative**: "It starts with a merge. The moment code hits main, Pulse's Event Bus triggers a chain reaction."
 - **Highlight**: Show the `OutboundWebhook` firing and the Event Bus logs in the terminal.
 
 ## 🎬 Scene 2: The Intelligence (The AI-OS)
@@ -17,7 +17,7 @@ This script outlines the narrative for the project demo video. The goal is to sh
 ## 🎬 Scene 3: The Digital Twin (Knowledge Graph)
 **Visual**: The Interactive Graph Visualization.
 - **Action**: Click the new Task created by the PR.
-- **Narrative**: "Gravity doesn't just store tasks; it maps them. We can see exactly how this change ripples through the project, identifying potential bottlenecks before they happen."
+- **Narrative**: "Pulse doesn't just store tasks; it maps them. We can see exactly how this change ripples through the project, identifying potential bottlenecks before they happen."
 - **Highlight**: The graph nodes lighting up and showing the "Critical Path."
 
 ## 🎬 Scene 4: The Human-in-the-Loop (Governance)
@@ -34,4 +34,4 @@ This script outlines the narrative for the project demo video. The goal is to sh
 
 ## 🏁 Outro
 **Visual**: Architecture Diagram.
-- **Narrative**: "Gravity: An AI-native project intelligence platform. Moving from tracking work to understanding it."
+- **Narrative**: "Pulse: An AI-native project intelligence platform. Moving from tracking work to understanding it."

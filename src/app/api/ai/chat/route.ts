@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         : lowerPrompt.includes("team") || lowerPrompt.includes("performance")
           ? `Team delivery is stable. ${overloaded?.name || "One team member"} is above capacity, while the latest sprint delivered ${VELOCITY_DATA.at(-1)?.delivered ?? 0} points. I would move two active work items before the next review.`
           : `Local ${persona} agent is ready. Based on the current workspace, I recommend turning “${latestPrompt}” into a focused task with a clear owner, due date, and acceptance criteria. Add OPENAI_API_KEY on Vercel to enable live model reasoning.`;
-      return NextResponse.json({ reply, executedActions: [], metrics: { latencyMs: Date.now() - startTime, estimatedCost: 0, agentUsed: persona, modelUsed: "Gravity local intelligence", selfReflectionPassed: true, mode: "local" } });
+      return NextResponse.json({ reply, executedActions: [], metrics: { latencyMs: Date.now() - startTime, estimatedCost: 0, agentUsed: persona, modelUsed: "Pulse local intelligence", selfReflectionPassed: true, mode: "local" } });
     }
 
     const client = getOpenRouterClient();

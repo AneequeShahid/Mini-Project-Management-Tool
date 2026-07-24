@@ -1,6 +1,6 @@
 # AI-OS Multi-Agent Runtime
 
-Detailed specifications of Gravity's orchestrator pipelines, specialist personas, self-reflection passes, and AI cost controls.
+Detailed specifications of Pulse's orchestrator pipelines, specialist personas, self-reflection passes, and AI cost controls.
 
 ## Specialist Personas
 

@@ -3,7 +3,7 @@ import { ROLE_DEFINITIONS } from '@/lib/data';
 export type WorkspaceRole = 'owner' | 'admin' | 'manager' | 'member' | 'viewer';
 
 export function getRequestRole(request: Request): WorkspaceRole {
-  const role = request.headers.get('x-gravity-role') as WorkspaceRole | null;
+  const role = request.headers.get('x-pulse-role') as WorkspaceRole | null;
   return ROLE_DEFINITIONS.some((item) => item.id === role) ? role! : 'owner';
 }
 

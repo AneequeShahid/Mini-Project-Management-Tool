@@ -1,6 +1,6 @@
-# Gravity Architecture Specification
+# Pulse Architecture Specification
 
-Detailed documentation of Gravity's technical design, service-to-database interfaces, and routing design.
+Detailed documentation of Pulse's technical design, service-to-database interfaces, and routing design.
 
 ## Core System Architecture
 
@@ -21,7 +21,7 @@ graph TD
 ## Technical Stack & Layout
 
 ### 1. Unified Client/Server App Router (Next.js 15)
-* Gravity is built using the Next.js 15 App Router framework. Page layout routes are static or dynamically compiled server-side.
+* Pulse is built using the Next.js 15 App Router framework. Page layout routes are static or dynamically compiled server-side.
 * Navigation states and active routes are managed via Next.js client hooks (`usePathname`).
 * Sidebar structure provides access to dashboards, gantt roadmaps, event timelines, RAG search systems, and human approval queue interfaces.
 

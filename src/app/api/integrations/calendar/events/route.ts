@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     } catch {
       // Fallback: Generate structured prototype payload if credentials are not configured yet
       const simulatedEventId = `local-${crypto.randomUUID()}`;
-      const simulatedMeetLink = `https://meet.jit.si/gravity-${simulatedEventId.slice(-8)}`;
+      const simulatedMeetLink = `https://meet.jit.si/pulse-${simulatedEventId.slice(-8)}`;
       const event = { id: simulatedEventId, title: summary, description, startTime, endTime, provider: 'local' as const, link: simulatedMeetLink, meetLink: simulatedMeetLink, attendees: [] as string[] };
       workspaceRuntime.events.unshift(event);
 

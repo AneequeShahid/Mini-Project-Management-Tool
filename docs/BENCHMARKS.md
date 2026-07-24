@@ -1,6 +1,6 @@
 # Platform Metrics & Benchmarks
 
-Operational measurements and target performance profiles for Gravity's AI engines, database operations, and caching systems.
+Operational measurements and target performance profiles for Pulse's AI engines, database operations, and caching systems.
 
 ## Simulated Baseline Targets
 > [!NOTE]

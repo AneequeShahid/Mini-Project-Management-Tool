@@ -1,4 +1,4 @@
-# Gravity Technical Case Study
+# Pulse Technical Case Study
 
 An analysis of system design decisions, technology selection trade-offs, and architecture justifications.
 
@@ -36,4 +36,4 @@ An analysis of system design decisions, technology selection trade-offs, and arc
 
 ## 6. Why a Hybrid RAG pipeline instead of vector search alone?
 * **Problem**: Vector searches excel at conceptual queries but perform poorly on specific keyword lookups (e.g. matching specific IDs or ticket labels like "PR #122").
-* **Resolution**: Gravity merges keyword index matches with pgvector cosine similarity calculations, passing the top results to a small LLM model for a final re-ranking pass.
+* **Resolution**: Pulse merges keyword index matches with pgvector cosine similarity calculations, passing the top results to a small LLM model for a final re-ranking pass.

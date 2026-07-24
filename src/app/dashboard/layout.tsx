@@ -94,7 +94,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #5B8CFF, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Sparkles size={14} color="#fff" />
             </div>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#f5f5f5" }}>Gravity</span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#f5f5f5" }}>Pulse</span>
           </div>
  
           {/* Workspace pill */}

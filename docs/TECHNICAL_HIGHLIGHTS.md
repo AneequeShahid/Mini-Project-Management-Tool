@@ -1,6 +1,6 @@
-# Gravity Technical Highlights & AI-OS
+# Pulse Technical Highlights & AI-OS
 
-This document specifies the multi-agent orchestration, self-reflection mechanisms, and security guardrail interceptors built into Gravity.
+This document specifies the multi-agent orchestration, self-reflection mechanisms, and security guardrail interceptors built into Pulse.
 
 ## 🤖 AI-OS Multi-Agent Runtime
 

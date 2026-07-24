@@ -1,6 +1,6 @@
 # Engineering Knowledge Graph
 
-Detailed description of Gravity's relational data graph linking tasks, pull requests, decisions, and developers.
+Detailed description of Pulse's relational data graph linking tasks, pull requests, decisions, and developers.
 
 ## Node Relationships
 

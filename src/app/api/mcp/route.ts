@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         const mcpExtraTools = [
           {
             name: "search_engineering_memory",
-            description: "Search Gravity Engineering Memory for architecture decisions, timeline events, and project history.",
+            description: "Search Pulse Engineering Memory for architecture decisions, timeline events, and project history.",
             inputSchema: {
               type: "object",
               properties: {
@@ -170,19 +170,19 @@ export async function POST(request: Request) {
           result: {
             resources: [
               {
-                uri: "gravity://tasks/all",
+                uri: "pulse://tasks/all",
                 name: "All Active Tasks",
                 description: "List of all active engineering tasks and backlog items",
                 mimeType: "application/json",
               },
               {
-                uri: "gravity://adrs/all",
+                uri: "pulse://adrs/all",
                 name: "Architecture Decision Records",
                 description: "Searchable architecture records and decision rationale",
                 mimeType: "application/json",
               },
               {
-                uri: "gravity://memory/engineering",
+                uri: "pulse://memory/engineering",
                 name: "Engineering Memory Log",
                 description: "Historical timeline events and engineering knowledge base",
                 mimeType: "application/json",

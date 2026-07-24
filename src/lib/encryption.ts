@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 const ALGORITHM = "aes-256-cbc";
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "gravity_default_encryption_secret_key_32_bytes"; // Must be 32 bytes
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "pulse_default_encryption_secret_key_32_bytes"; // Must be 32 bytes
 const IV_LENGTH = 16;
 
 export function encrypt(text: string): string {

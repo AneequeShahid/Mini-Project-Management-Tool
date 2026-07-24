@@ -1,6 +1,6 @@
-# Gravity: Engineering Decision Records (ADRs)
+# Pulse: Engineering Decision Records (ADRs)
 
-This document outlines the "Why" behind the architectural choices made in Gravity.
+This document outlines the "Why" behind the architectural choices made in Pulse.
 
 ## 📂 Case Study 1: Why a Knowledge Graph instead of Flat Documents?
 

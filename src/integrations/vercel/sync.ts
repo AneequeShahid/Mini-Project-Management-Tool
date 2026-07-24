@@ -8,7 +8,7 @@ export class VercelConnector extends BaseIntegrationConnector {
       success: true,
       projectId,
       deployments: [
-        { id: "dep_123", status: "READY", url: "https://gravity-core.vercel.app" }
+        { id: "dep_123", status: "READY", url: "https://pulse-core.vercel.app" }
       ],
     };
   }
