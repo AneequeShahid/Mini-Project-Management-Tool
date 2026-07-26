@@ -12,17 +12,17 @@ const DEFAULT_COMPETITORS = [
 
 function cleanHtml(html: string): string {
   let text = html;
-  text = text.replace(/<script[\\s\\S]*?<\\/script>/gi, '');
-  text = text.replace(/<style[\\s\\S]*?<\\/style>/gi, '');
-  text = text.replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, '');
-  text = text.replace(/<svg[\\s\\S]*?<\\/svg>/gi, '');
-  text = text.replace(/<iframe[\\s\\S]*?<\\/iframe>/gi, '');
-  text = text.replace(/<!--[\\s\\S]*?-->/g, '');
-  text = text.replace(/<[^>]+>/g, '\\n');
+  text = text.replace(/<script[\s\S]*?<\/script>/gi, '');
+  text = text.replace(/<style[\s\S]*?<\/style>/gi, '');
+  text = text.replace(/<noscript[\s\S]*?<\/noscript>/gi, '');
+  text = text.replace(/<svg[\s\S]*?<\/svg>/gi, '');
+  text = text.replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
+  text = text.replace(/<!--[\s\S]*?-->/g, '');
+  text = text.replace(/<[^>]+>/g, '\n');
   text = text.replace(/&nbsp;/g, ' ');
   text = text.replace(/&amp;/g, '&');
-  const lines = text.split('\\n').map(l => l.trim()).filter(l => l.length > 0);
-  return lines.join('\\n');
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  return lines.join('\n');
 }
 
 export async function GET() {
