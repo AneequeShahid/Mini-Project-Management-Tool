@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { zoomMeetingsConnector } from "@/integrations/zoom/meetings";
+import { zoomMeetingsConnector } from "@/services/integrations/zoom/meetings";
 import { scheduleLocalMeeting } from "@/lib/workspaceRuntime";
 
 export async function POST(request: Request) {

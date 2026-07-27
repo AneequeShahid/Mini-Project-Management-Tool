@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { googleCalendarConnector } from "@/integrations/google/calendar";
+import { googleCalendarConnector } from "@/services/integrations/google/calendar";
 import { CALENDAR_EVENTS } from "@/lib/data";
 import { workspaceRuntime } from "@/lib/workspaceRuntime";
 

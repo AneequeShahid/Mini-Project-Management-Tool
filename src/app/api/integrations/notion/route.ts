@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { notionConnector } from "@/integrations/notion/sync";
+import { notionConnector } from "@/services/integrations/notion/sync";
 
 export async function POST(request: Request) {
   try {

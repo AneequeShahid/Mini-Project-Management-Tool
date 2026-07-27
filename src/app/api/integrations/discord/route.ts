@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { discordConnector } from "@/integrations/discord/webhook";
+import { discordConnector } from "@/services/integrations/discord/webhook";
 
 export async function POST(request: Request) {
   try {

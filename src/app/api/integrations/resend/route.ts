@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resendConnector } from "@/integrations/resend/email";
+import { resendConnector } from "@/services/integrations/resend/email";
 
 export async function POST(request: Request) {
   try {

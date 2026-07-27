@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { linearConnector } from "@/integrations/linear/sync";
+import { linearConnector } from "@/services/integrations/linear/sync";
 
 export async function POST(request: Request) {
   try {

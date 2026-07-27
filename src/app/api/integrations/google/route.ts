@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { googleCalendarConnector } from "@/integrations/google/calendar";
+import { googleCalendarConnector } from "@/services/integrations/google/calendar";
 
 export async function POST(request: Request) {
   try {

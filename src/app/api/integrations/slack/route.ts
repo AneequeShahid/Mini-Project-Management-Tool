@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { slackConnector } from "@/integrations/slack/webhook";
+import { slackConnector } from "@/services/integrations/slack/webhook";
 
 export async function POST(request: Request) {
   try {

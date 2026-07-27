@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { microsoftTeamsConnector } from "@/integrations/microsoft/teams";
+import { microsoftTeamsConnector } from "@/services/integrations/microsoft/teams";
 
 export async function POST(request: Request) {
   try {

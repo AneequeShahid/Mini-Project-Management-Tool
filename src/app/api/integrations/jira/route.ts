@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { jiraConnector } from "@/integrations/jira/sync";
+import { jiraConnector } from "@/services/integrations/jira/sync";
 
 export async function POST(request: Request) {
   try {
