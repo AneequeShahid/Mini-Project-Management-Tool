@@ -75,6 +75,15 @@ function readLocalDB(): any {
         }
       ]
     };
+    
+    (seed as any).scraper_targets = [
+      { id: "st-1", name: "Linear", url: "https://linear.app", category: "competitor", is_active: true, check_interval: 24, last_checked: null, created_at: new Date().toISOString() },
+      { id: "st-2", name: "ClickUp", url: "https://clickup.com", category: "competitor", is_active: true, check_interval: 24, last_checked: null, created_at: new Date().toISOString() },
+      { id: "st-3", name: "Notion", url: "https://notion.so", category: "competitor", is_active: false, check_interval: 48, last_checked: null, created_at: new Date().toISOString() },
+    ];
+    (seed as any).scraper_snapshots = [];
+    (seed as any).scraper_alerts = [];
+
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(seed, null, 2));
     return seed;
   }
@@ -460,6 +469,198 @@ export const dbHelper = {
       return data;
     } catch {
       return readLocalDB().sprints.filter((x: any) => x.project_id === projectId);
+    }
+  },
+
+  // Scraper Targets
+  getScraperTargets: async () => {
+    if (isPlaceholder) {
+      return readLocalDB().scraper_targets;
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_targets').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    } catch {
+      return readLocalDB().scraper_targets;
+    }
+  },
+
+  createScraperTarget: async (target: any) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      const newTarget = { id: 'st-' + Math.random().toString(36).substr(2, 9), ...target };
+      db.scraper_targets.unshift(newTarget);
+      writeLocalDB(db);
+      return newTarget;
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_targets').insert([target]).select().single();
+      if (error) throw error;
+      return data;
+    } catch {
+      const db = readLocalDB();
+      const newTarget = { id: 'st-' + Math.random().toString(36).substr(2, 9), ...target };
+      db.scraper_targets.unshift(newTarget);
+      writeLocalDB(db);
+      return newTarget;
+    }
+  },
+
+  updateScraperTarget: async (id: string, updates: any) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      db.scraper_targets = db.scraper_targets.map((x: any) => x.id === id ? { ...x, ...updates } : x);
+      writeLocalDB(db);
+      return db.scraper_targets.find((x: any) => x.id === id);
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_targets').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    } catch {
+      const db = readLocalDB();
+      db.scraper_targets = db.scraper_targets.map((x: any) => x.id === id ? { ...x, ...updates } : x);
+      writeLocalDB(db);
+      return db.scraper_targets.find((x: any) => x.id === id);
+    }
+  },
+
+  deleteScraperTarget: async (id: string) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      db.scraper_targets = db.scraper_targets.filter((x: any) => x.id !== id);
+      writeLocalDB(db);
+      return { success: true };
+    }
+    try {
+      const { error } = await supabaseServer.from('scraper_targets').delete().eq('id', id);
+      if (error) throw error;
+      return { success: true };
+    } catch {
+      const db = readLocalDB();
+      db.scraper_targets = db.scraper_targets.filter((x: any) => x.id !== id);
+      writeLocalDB(db);
+      return { success: true };
+    }
+  },
+
+  // Scraper Snapshots
+  getScraperSnapshots: async (url?: string) => {
+    if (isPlaceholder) {
+      let list = readLocalDB().scraper_snapshots;
+      if (url) list = list.filter((x: any) => x.url === url);
+      return list.sort((a: any, b: any) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
+    }
+    try {
+      let query = supabaseServer.from('scraper_snapshots').select('*').order('scraped_at', { ascending: false });
+      if (url) query = query.eq('url', url);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    } catch {
+      let list = readLocalDB().scraper_snapshots;
+      if (url) list = list.filter((x: any) => x.url === url);
+      return list.sort((a: any, b: any) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
+    }
+  },
+
+  saveScraperSnapshot: async (snapshot: any) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      const newSnapshot = { id: 'ss-' + Math.random().toString(36).substr(2, 9), ...snapshot };
+      db.scraper_snapshots.unshift(newSnapshot);
+      writeLocalDB(db);
+      return newSnapshot;
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_snapshots').insert([snapshot]).select().single();
+      if (error) throw error;
+      return data;
+    } catch {
+      const db = readLocalDB();
+      const newSnapshot = { id: 'ss-' + Math.random().toString(36).substr(2, 9), ...snapshot };
+      db.scraper_snapshots.unshift(newSnapshot);
+      writeLocalDB(db);
+      return newSnapshot;
+    }
+  },
+
+  getLatestSnapshot: async (url: string) => {
+    if (isPlaceholder) {
+      const list = readLocalDB().scraper_snapshots.filter((x: any) => x.url === url);
+      list.sort((a: any, b: any) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
+      return list[0] || null;
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_snapshots').select('*').eq('url', url).order('scraped_at', { ascending: false }).limit(1).single();
+      if (error && error.code !== 'PGRST116') throw error;
+      return data || null;
+    } catch {
+      const list = readLocalDB().scraper_snapshots.filter((x: any) => x.url === url);
+      list.sort((a: any, b: any) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
+      return list[0] || null;
+    }
+  },
+
+  // Scraper Alerts
+  getScraperAlerts: async (status?: string) => {
+    if (isPlaceholder) {
+      let list = readLocalDB().scraper_alerts;
+      if (status) list = list.filter((x: any) => x.status === status);
+      return list.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    try {
+      let query = supabaseServer.from('scraper_alerts').select('*').order('created_at', { ascending: false });
+      if (status) query = query.eq('status', status);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    } catch {
+      let list = readLocalDB().scraper_alerts;
+      if (status) list = list.filter((x: any) => x.status === status);
+      return list.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  },
+
+  saveScraperAlert: async (alert: any) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      const newAlert = { id: 'sa-' + Math.random().toString(36).substr(2, 9), status: 'unread', created_at: new Date().toISOString(), ...alert };
+      db.scraper_alerts.unshift(newAlert);
+      writeLocalDB(db);
+      return newAlert;
+    }
+    try {
+      const alertData = { status: 'unread', created_at: new Date().toISOString(), ...alert };
+      const { data, error } = await supabaseServer.from('scraper_alerts').insert([alertData]).select().single();
+      if (error) throw error;
+      return data;
+    } catch {
+      const db = readLocalDB();
+      const newAlert = { id: 'sa-' + Math.random().toString(36).substr(2, 9), status: 'unread', created_at: new Date().toISOString(), ...alert };
+      db.scraper_alerts.unshift(newAlert);
+      writeLocalDB(db);
+      return newAlert;
+    }
+  },
+
+  markScraperAlertRead: async (id: string) => {
+    if (isPlaceholder) {
+      const db = readLocalDB();
+      db.scraper_alerts = db.scraper_alerts.map((x: any) => x.id === id ? { ...x, status: 'read' } : x);
+      writeLocalDB(db);
+      return db.scraper_alerts.find((x: any) => x.id === id);
+    }
+    try {
+      const { data, error } = await supabaseServer.from('scraper_alerts').update({ status: 'read' }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    } catch {
+      const db = readLocalDB();
+      db.scraper_alerts = db.scraper_alerts.map((x: any) => x.id === id ? { ...x, status: 'read' } : x);
+      writeLocalDB(db);
+      return db.scraper_alerts.find((x: any) => x.id === id);
     }
   }
 };
