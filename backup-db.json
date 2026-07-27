@@ -1,0 +1,213 @@
+{
+  "work_item_types": [
+    {
+      "id": "wit-epic",
+      "name": "Epic",
+      "icon": "award",
+      "color": "#a855f7"
+    },
+    {
+      "id": "wit-story",
+      "name": "Story",
+      "icon": "book-open",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "wit-bug",
+      "name": "Bug",
+      "icon": "bug",
+      "color": "#ef4444"
+    },
+    {
+      "id": "wit-task",
+      "name": "Task",
+      "icon": "check-square",
+      "color": "#06b6d4"
+    }
+  ],
+  "custom_field_definitions": [
+    {
+      "id": "cfd-sla",
+      "name": "SLA Hours",
+      "type": "number",
+      "options": []
+    },
+    {
+      "id": "cfd-impact",
+      "name": "Customer Impact",
+      "type": "select",
+      "options": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ]
+    },
+    {
+      "id": "cfd-phase",
+      "name": "Dev Phase",
+      "type": "select",
+      "options": [
+        "Design",
+        "Implementation",
+        "Verification",
+        "Released"
+      ]
+    }
+  ],
+  "views": [
+    {
+      "id": "v-default-kanban",
+      "name": "Sprint Kanban Board",
+      "type": "Kanban",
+      "query": {
+        "groupBy": "status",
+        "sortBy": "due_date"
+      }
+    },
+    {
+      "id": "v-all-bugs",
+      "name": "High Severity Bugs",
+      "type": "List",
+      "query": {
+        "work_item_type": "wit-bug",
+        "priority": "High"
+      }
+    }
+  ],
+  "triage_items": [
+    {
+      "id": "tr-1",
+      "source": "email",
+      "sender": "alex@customer.com",
+      "title": "Cannot sync zoom calendars",
+      "description": "Getting a connection timeout when linking Google calendars on dashboard.",
+      "status": "new",
+      "created_at": "2026-07-27T07:06:23.023Z"
+    },
+    {
+      "id": "tr-2",
+      "source": "form",
+      "sender": "Sarah Jenkins",
+      "title": "Workflow automation fails on high load",
+      "description": "Our custom triggers are dropping tasks when more than 10 webhooks fire concurrently.",
+      "status": "new",
+      "created_at": "2026-07-27T04:06:23.024Z"
+    },
+    {
+      "id": "tr-3",
+      "source": "api",
+      "sender": "pulse-guardrail-bot",
+      "title": "Guardrail Breach: Unauthorized API Call Detected",
+      "description": "An automated script attempted to call zoom meeting endpoints without a valid bearer key.",
+      "status": "new",
+      "created_at": "2026-07-27T09:06:23.024Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "p-acme",
+      "name": "Pulse Core Infrastructure",
+      "description": "Core service meshes, event bus integration, and RAG pipelines."
+    }
+  ],
+  "sprints": [
+    {
+      "id": "s-1",
+      "project_id": "p-acme",
+      "name": "Sprint 15: Auth & RAG Integration",
+      "status": "Active"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t-1",
+      "project_id": "p-acme",
+      "sprint_id": "s-1",
+      "title": "Migrate Auth Module and Setup pgvector Hybrid Retrieval",
+      "description": "Sync auth schema with workspace memberships and configure ivfflat indexes for real-time memory retrieval.",
+      "status": "Todo",
+      "priority": "Critical",
+      "story_points": 5,
+      "due_date": "2026-08-01",
+      "work_item_type_id": "wit-story",
+      "custom_fields": {
+        "cfd-sla": 24,
+        "cfd-impact": "Critical",
+        "cfd-phase": "Design"
+      },
+      "document_content": "<h2>Auth & pgvector Architecture Specification</h2><p>This is the living spec for our Pulse indexing system. Feel free to format this using standard TipTap controls.</p><ul><li>Use aes-256-cbc for encrypted credentials.</li><li>Utilize pgvector cosine distance operators.</li></ul>",
+      "created_at": "2026-07-27T09:06:23.024Z"
+    },
+    {
+      "id": "t-2",
+      "project_id": "p-acme",
+      "sprint_id": "s-1",
+      "title": "Fix callback redirect failures on Vercel deployment",
+      "description": "Handle custom domains and port mappings inside OAuth callbacks dynamically.",
+      "status": "In Progress",
+      "priority": "High",
+      "story_points": 3,
+      "due_date": "2026-07-29",
+      "work_item_type_id": "wit-bug",
+      "custom_fields": {
+        "cfd-sla": 12,
+        "cfd-impact": "High",
+        "cfd-phase": "Implementation"
+      },
+      "document_content": "<h3>OAuth Debug Notes</h3><p>Verify callback URLs in the Zoom developers console.</p>",
+      "created_at": "2026-07-27T09:06:23.024Z"
+    }
+  ],
+  "scraper_targets": [
+    {
+      "id": "st-1",
+      "name": "Linear",
+      "url": "https://linear.app",
+      "category": "competitor",
+      "is_active": true,
+      "check_interval": 24,
+      "last_checked": null,
+      "created_at": "2026-07-27T09:06:23.024Z"
+    },
+    {
+      "id": "st-2",
+      "name": "ClickUp",
+      "url": "https://clickup.com",
+      "category": "competitor",
+      "is_active": true,
+      "check_interval": 24,
+      "last_checked": null,
+      "created_at": "2026-07-27T09:06:23.024Z"
+    },
+    {
+      "id": "st-3",
+      "name": "Notion",
+      "url": "https://notion.so",
+      "category": "competitor",
+      "is_active": false,
+      "check_interval": 48,
+      "last_checked": null,
+      "created_at": "2026-07-27T09:06:23.024Z"
+    }
+  ],
+  "scraper_snapshots": [
+    {
+      "id": "ss-nabgeko0l",
+      "url": "https://example.com",
+      "label": "Test Site",
+      "status": "success",
+      "cleaned_text": "Example Domain     Example Domain  This domain is for use in documentation examples without needing permission. Avoid use in operations.   Learn more",
+      "full_text": "<!doctype html><html lang=\"en\"><head><title>Example Domain</title><link rel=\"icon\" href=\"data:,\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://iana.org/domains/example\">Learn more</a></p></div></body></html>\n",
+      "text_length": 149,
+      "hash": "322bbae0b3b85eef01ae925a2c575cebd1501822ded5b5285ee24cbe1f1883ad",
+      "title": "Example Domain",
+      "meta_description": "",
+      "scraped_at": "2026-07-27T09:06:44.421Z",
+      "changed": false,
+      "diff_summary": null,
+      "ai_analysis": null
+    }
+  ],
+  "scraper_alerts": []
+}
