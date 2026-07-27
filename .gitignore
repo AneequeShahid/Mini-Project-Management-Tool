@@ -31,3 +31,7 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ignore nested repositories and local backups
+OmniRoute/
+backup-db.json
