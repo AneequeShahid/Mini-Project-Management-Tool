@@ -35,3 +35,26 @@ next-env.d.ts
 # Ignore nested repositories and local backups
 OmniRoute/
 backup-db.json
+
+# ML Models and data
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+*.onnx
+models/
+
+# Data files (large)
+data/processed/
+data/augmented/
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+
+# Logs
+*.log
+logs/
