@@ -1,5 +1,5 @@
-import { supabaseServer } from "./supabaseServer";
-import { EventBus } from "./eventBus";
+import { supabaseServer } from "@/lib/supabaseServer";
+import { EventBus } from "@/observability/eventBus";
 
 export interface ToolDefinition {
   name: string;

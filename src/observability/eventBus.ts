@@ -1,4 +1,4 @@
-import { supabaseServer } from "./supabaseServer";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export interface SystemEvent {
   workspaceId?: string;
