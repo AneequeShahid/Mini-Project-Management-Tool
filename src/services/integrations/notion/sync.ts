@@ -1,7 +1,7 @@
 import { BaseIntegrationConnector } from "../base";
 import { Client } from "@notionhq/client";
 import { getDecryptedAccessToken } from "@/lib/integrationTokenManager";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 
 export class NotionConnector extends BaseIntegrationConnector {
   providerName = "notion";

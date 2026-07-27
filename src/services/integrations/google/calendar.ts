@@ -1,7 +1,7 @@
 import { BaseIntegrationConnector } from "../base";
 import { google } from "googleapis";
 import { getDecryptedAccessToken } from "@/lib/integrationTokenManager";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 
 export class GoogleCalendarConnector extends BaseIntegrationConnector {
   providerName = "google-calendar";

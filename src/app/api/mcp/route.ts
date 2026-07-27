@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { toolRegistry } from "@/lib/toolRegistry";
+import { toolRegistry } from "@/toolRegistry";
 import { TASKS, ADR_RECORDS, MEMORY_NODES } from "@/lib/data";
 
 interface JsonRpcRequest {

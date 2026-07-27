@@ -1,7 +1,7 @@
 import { BaseIntegrationConnector } from "../base";
 import { WebClient } from "@slack/web-api";
 import { getDecryptedAccessToken } from "@/lib/integrationTokenManager";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 
 export class SlackConnector extends BaseIntegrationConnector {
   providerName = "slack";

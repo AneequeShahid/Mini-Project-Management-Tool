@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { toolRegistry } from "@/lib/toolRegistry";
+import { toolRegistry } from "@/toolRegistry";
 import { DELIVERY_FORECAST, TEAM_PERFORMANCE, VELOCITY_DATA } from "@/lib/data";
 
 const getOpenRouterClient = () => {

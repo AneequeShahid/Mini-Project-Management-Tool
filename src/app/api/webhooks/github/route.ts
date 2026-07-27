@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 import { TASKS } from "@/lib/data";
 
 export async function POST(request: Request) {

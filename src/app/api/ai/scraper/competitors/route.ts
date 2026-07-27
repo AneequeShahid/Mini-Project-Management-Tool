@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { EventBus } from '@/lib/eventBus';
+import { EventBus } from '@/observability/eventBus';
 import { dbHelper } from '@/lib/dbHelper';
-import { scraperEngine } from '@/lib/scraperEngine';
+import { scraperEngine } from '@/services/scraper';
 
 export async function GET() {
   try {

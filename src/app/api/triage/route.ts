@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { TASKS } from '@/lib/data';
-import { EventBus } from '@/lib/eventBus';
+import { EventBus } from '@/observability/eventBus';
 
 const TRIAGE_ITEMS = [
   { id: 'tri-1', title: 'Auth token refresh fails after 1hr idle', type: 'bug', priority: 'Critical', source: 'GitHub Issue #47', status: 'pending', created_at: '2026-07-13T08:00:00Z', assignee: null, confidence: 0.95 },

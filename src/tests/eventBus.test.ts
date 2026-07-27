@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 
 vi.mock("@/lib/supabaseServer", () => {
   return {

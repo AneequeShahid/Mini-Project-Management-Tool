@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { toolRegistry } from "@/lib/toolRegistry";
+import { toolRegistry } from "@/toolRegistry";
 
 vi.mock("@/lib/supabaseServer", () => {
   return {

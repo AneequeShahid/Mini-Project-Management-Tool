@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
-import { toolRegistry } from "@/lib/toolRegistry";
+import { toolRegistry } from "@/toolRegistry";
 
 export async function GET(request: Request) {
   const { data, error } = await supabaseServer.from("proposals").select("*").eq("status", "Pending");

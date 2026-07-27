@@ -1,6 +1,6 @@
 import { BaseIntegrationConnector } from "../base";
 import { getDecryptedAccessToken } from "@/lib/integrationTokenManager";
-import { EventBus } from "@/lib/eventBus";
+import { EventBus } from "@/observability/eventBus";
 
 export class ZoomMeetingsConnector extends BaseIntegrationConnector {
   providerName = "zoom";

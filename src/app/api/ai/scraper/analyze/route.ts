@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { scraperEngine } from '@/lib/scraperEngine';
+import { scraperEngine } from '@/services/scraper';
 
 export async function POST(request: Request) {
   try {
