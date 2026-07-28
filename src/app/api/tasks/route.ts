@@ -1,13 +1,32 @@
 import { NextResponse } from 'next/server';
-import { TASKS } from '@/lib/data';
+import { supabaseServer } from '@/lib/supabaseServer';
+
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const project = searchParams.get('project');
-  const tasks = project ? TASKS.filter(t => t.project_id === project) : TASKS;
-  return NextResponse.json(tasks);
+  try {
+    const { searchParams } = new URL(req.url);
+    const project = searchParams.get('project');
+    
+    let query = supabaseServer.from('tasks').select('*').order('created_at', { ascending: false });
+    if (project) {
+      query = query.eq('project_id', project);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    return NextResponse.json(data);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
+
 export async function POST(req: Request) {
-  const body = await req.json();
-  const newTask = { id: `task-${Date.now()}`, ...body, created_at: new Date().toISOString() };
-  return NextResponse.json(newTask, { status: 201 });
+  try {
+    const body = await req.json();
+    const { data, error } = await supabaseServer.from('tasks').insert([body]).select().single();
+    if (error) throw error;
+    return NextResponse.json(data, { status: 201 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }

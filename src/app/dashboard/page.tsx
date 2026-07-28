@@ -6,7 +6,6 @@ import {
   Sparkles, Plus, Trash2, Cpu, GitPullRequest,
   Database, ShieldAlert
 } from "lucide-react";
-import { DashboardAnalytics } from "@/components/DashboardAnalytics";
 
 const activeAgents = [
   { name: "Developer Agent", task: "Writing unit tests for Auth OAuth callback sync", status: "coding", avatar: "DA" },
@@ -361,8 +360,6 @@ export default function DashboardPage() {
 
         </div>
       </div>
-
-      <DashboardAnalytics />
     </div>
   );
 }

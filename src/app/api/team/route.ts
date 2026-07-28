@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
-import { ROLE_DEFINITIONS, TEAM_PERFORMANCE } from '@/lib/data';
-import { can, getRequestRole } from '@/lib/roles';
+import { supabaseServer } from '@/lib/supabaseServer';
+import { ROLE_DEFINITIONS } from '@/lib/roles'; // Note: if ROLE_DEFINITIONS was in lib/data, we might need to recreate it or hardcode. Let's fix this in a sec.
 
 export async function GET(request: Request) {
-  const role = getRequestRole(request);
-  const members = can(role, 'performance:view') || role === 'admin' || role === 'owner'
-    ? TEAM_PERFORMANCE
-    : TEAM_PERFORMANCE.map(({ ai_summary, delivery_score, quality_score, collaboration_score, growth_trend, ...member }) => member);
-  return NextResponse.json({ currentRole: role, roles: ROLE_DEFINITIONS, members, permissions: ROLE_DEFINITIONS.find((item) => item.id === role)?.permissions || [] });
+  try {
+    const { data, error } = await supabaseServer.from('team_members').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
-export async function PATCH(request: Request) {
-  const actor = getRequestRole(request);
-  if (!can(actor, 'members:manage')) return NextResponse.json({ error: 'Your role cannot manage member access.' }, { status: 403 });
-  const { memberId, role } = await request.json();
-  const member = TEAM_PERFORMANCE.find((item) => item.id === memberId);
-  if (!member || !ROLE_DEFINITIONS.some((item) => item.id === role)) return NextResponse.json({ error: 'Invalid member or role.' }, { status: 400 });
-  (member as any).access_role = role;
-  return NextResponse.json(member);
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { data, error } = await supabaseServer.from('team_members').insert([body]).select().single();
+    if (error) throw error;
+    return NextResponse.json(data, { status: 201 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }

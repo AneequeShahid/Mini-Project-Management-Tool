@@ -1,10 +1,16 @@
-import { ROLE_DEFINITIONS } from '@/lib/data';
+export const ROLE_DEFINITIONS = [
+  { id: 'owner', permissions: ['all'] },
+  { id: 'admin', permissions: ['members:manage', 'projects:manage', 'performance:view'] },
+  { id: 'manager', permissions: ['projects:manage', 'performance:view'] },
+  { id: 'member', permissions: [] },
+  { id: 'viewer', permissions: [] }
+];
 
 export type WorkspaceRole = 'owner' | 'admin' | 'manager' | 'member' | 'viewer';
 
 export function getRequestRole(request: Request): WorkspaceRole {
   const role = request.headers.get('x-pulse-role') as WorkspaceRole | null;
-  return ROLE_DEFINITIONS.some((item) => item.id === role) ? role! : 'owner';
+  return ROLE_DEFINITIONS.some((item) => item.id === role) ? (role as WorkspaceRole) : 'owner';
 }
 
 export function can(role: WorkspaceRole, permission: string) {

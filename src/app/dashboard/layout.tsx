@@ -22,38 +22,18 @@ const navGroups = [
     label: "Work & Planning",
     items: [
       { href: "/dashboard/views", label: "Workspace Views", icon: LayoutGrid, badge: "12" },
-      { href: "/dashboard/triage", label: "Triage Intake", icon: Inbox },
       { href: "/dashboard/work-items", label: "Work Items", icon: Sliders },
       { href: "/dashboard/team", label: "Team Intelligence", icon: UsersRound, tag: "AI" },
       { href: "/dashboard/calendar", label: "Calendar Hub", icon: Calendar, badge: "3" },
       { href: "/dashboard/gantt", label: "Roadmaps", icon: GanttChartSquare },
-      { href: "/dashboard/wrapped", label: "Project Wrapped", icon: Gift },
     ]
   },
   {
     label: "Knowledge & AI",
     items: [
-      { href: "/dashboard/timeline", label: "AI Timeline", icon: Compass },
-      { href: "/dashboard/agents", label: "AI Agents", icon: Cpu },
-      { href: "/dashboard/adr", label: "ADR Log", icon: GitPullRequest },
       { href: "/dashboard/graph", label: "Knowledge Graph", icon: Network },
-      { href: "/dashboard/memory", label: "Eng Memory", icon: Brain, tag: "AI" },
       { href: "/dashboard/decompose", label: "Task Decompose", icon: Sparkles, tag: "NEW" },
       { href: "/dashboard/scraper", label: "Web Intelligence", icon: Globe, tag: "AI" },
-    ]
-  },
-  {
-    label: "Automation",
-    items: [
-      { href: "/dashboard/observability", label: "Observability", icon: BarChart3 },
-      { href: "/dashboard/guardrails", label: "AI Guardrails", icon: ShieldAlert },
-      { href: "/dashboard/integrations", label: "Integrations", icon: Link2 },
-      { href: "/dashboard/automation", label: "Automation", icon: Activity },
-      { href: "/dashboard/meetings", label: "Meetings", icon: Video },
-      { href: "/dashboard/workflows", label: "Workflows", icon: History, badge: "8" },
-      { href: "/dashboard/webhooks", label: "Webhooks", icon: Webhook },
-      { href: "/dashboard/deployments", label: "Deployments", icon: Layers },
-      { href: "/dashboard/files", label: "Files", icon: Folder, tag: "NEW" },
     ]
   }
 ];
